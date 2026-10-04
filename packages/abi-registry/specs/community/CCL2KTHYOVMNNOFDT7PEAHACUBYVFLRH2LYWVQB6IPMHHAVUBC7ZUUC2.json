@@ -1,0 +1,1742 @@
+{
+  "contractId": "CCL2KTHYOVMNNOFDT7PEAHACUBYVFLRH2LYWVQB6IPMHHAVUBC7ZUUC2",
+  "description": "Slender (eq-lab) non-custodial lending pool on Stellar mainnet: deposit, borrow, repay, liquidate and flash-loan against USDC/XLM/XRP reserves.",
+  "events": [
+    {
+      "data": [
+        {
+          "name": "ir_alpha",
+          "type": "u32"
+        },
+        {
+          "name": "ir_initial_rate",
+          "type": "u32"
+        },
+        {
+          "name": "ir_max_rate",
+          "type": "u32"
+        },
+        {
+          "name": "ir_scaling_coeff",
+          "type": "u32"
+        },
+        {
+          "name": "base_asset_decimals",
+          "type": "u32"
+        },
+        {
+          "name": "initial_health",
+          "type": "u32"
+        },
+        {
+          "name": "grace_period",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp_window",
+          "type": "u64"
+        },
+        {
+          "name": "flash_loan_fee",
+          "type": "u32"
+        },
+        {
+          "name": "user_assets_limit",
+          "type": "u32"
+        },
+        {
+          "name": "min_collat_amount",
+          "type": "i128"
+        },
+        {
+          "name": "min_debt_amount",
+          "type": "i128"
+        },
+        {
+          "name": "liquidation_protocol_fee",
+          "type": "u32"
+        }
+      ],
+      "name": "InitializedEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"initialize\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "base_asset_address",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "name": "ReserveUsedAsCollEnabledEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"reserve_used_as_coll_enabled\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "name": "ReserveUsedAsCollDisabledEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"reserve_used_as_coll_disabled\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "name": "DepositEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"deposit\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "name": "WithdrawEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"withdraw\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "name": "BorrowEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"borrow\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "name": "RepayEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"repay\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "liq_cap",
+          "type": "i128"
+        },
+        {
+          "name": "pen_order",
+          "type": "u32"
+        },
+        {
+          "name": "util_cap",
+          "type": "u32"
+        },
+        {
+          "name": "discount",
+          "type": "u32"
+        }
+      ],
+      "name": "CollatConfigChangeEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"collat_config_change\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [],
+      "name": "BorrowingEnabledEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"borrowing_enabled\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [],
+      "name": "BorrowingDisabledEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"borrowing_disabled\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "activated",
+          "type": "bool"
+        }
+      ],
+      "name": "ReserveStatusChangedEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"reserve_status_changed\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "covered_debt",
+          "type": "i128"
+        },
+        {
+          "name": "liquidated_collateral",
+          "type": "i128"
+        }
+      ],
+      "name": "LiquidationEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"liquidation\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "data": [
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "premium",
+          "type": "i128"
+        },
+        {
+          "name": "borrow",
+          "type": "bool"
+        }
+      ],
+      "name": "FlashLoanEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"flash_loan\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "initialize",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "pool_config",
+          "type": {
+            "name": "PoolConfig",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "upgrade",
+      "params": [
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "upgrade_token",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "s_token",
+          "type": "bool"
+        },
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "version",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "init_reserve",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "reserve_type",
+          "type": {
+            "name": "ReserveType",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_reserve_status",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "is_active",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "enable_borrowing_on_reserve",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "configure_as_collateral",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "params",
+          "type": {
+            "name": "CollateralParamsInput",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "get_reserve",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "inner": {
+          "name": "ReserveData",
+          "type": "named"
+        },
+        "type": "option"
+      }
+    },
+    {
+      "name": "collat_coeff",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "name": "debt_coeff",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_pool_configuration",
+      "params": [
+        {
+          "name": "config",
+          "type": {
+            "name": "PoolConfig",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "pool_configuration",
+      "params": [],
+      "returns": {
+        "err": "error",
+        "ok": {
+          "name": "PoolConfig",
+          "type": "named"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_price_feeds",
+      "params": [
+        {
+          "name": "inputs",
+          "type": {
+            "item": {
+              "name": "PriceFeedConfigInput",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "price_feeds",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "inner": {
+          "name": "PriceFeedConfig",
+          "type": "named"
+        },
+        "type": "option"
+      }
+    },
+    {
+      "name": "deposit",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "repay",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "finalize_transfer",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "balance_from_before",
+          "type": "i128"
+        },
+        {
+          "name": "balance_to_before",
+          "type": "i128"
+        },
+        {
+          "name": "s_token_supply",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "withdraw",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "borrow",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_pause",
+      "params": [
+        {
+          "name": "value",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "pause_info",
+      "params": [],
+      "returns": {
+        "name": "PauseInfo",
+        "type": "named"
+      }
+    },
+    {
+      "name": "account_position",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": {
+          "name": "AccountPosition",
+          "type": "named"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "name": "liquidate",
+      "params": [
+        {
+          "name": "liquidator",
+          "type": "address"
+        },
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_as_collateral",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "use_as_collateral",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "user_configuration",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": {
+          "name": "UserConfiguration",
+          "type": "named"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "name": "token_balance",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "token_total_supply",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "flash_loan",
+      "params": [
+        {
+          "name": "who",
+          "type": "address"
+        },
+        {
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "name": "loan_assets",
+          "type": {
+            "item": {
+              "name": "FlashLoanAsset",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "params",
+          "type": "bytes"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "twap_median_price",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "name": "protocol_fee",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "claim_protocol_fee",
+      "params": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": "error",
+        "ok": "void",
+        "type": "result"
+      }
+    }
+  ],
+  "name": "Slender Lending Pool",
+  "network": "mainnet",
+  "types": {
+    "AccountPosition": {
+      "fields": [
+        {
+          "name": "debt",
+          "type": "i128"
+        },
+        {
+          "name": "discounted_collateral",
+          "type": "i128"
+        },
+        {
+          "name": "npv",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "AccountPosition"
+    },
+    "Asset": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "Stellar"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "symbol"
+            }
+          ],
+          "name": "Other"
+        }
+      ],
+      "kind": "union",
+      "name": "Asset"
+    },
+    "AssetBalance": {
+      "fields": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "balance",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "AssetBalance"
+    },
+    "BaseAssetConfig": {
+      "fields": [
+        {
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "name": "decimals",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "BaseAssetConfig"
+    },
+    "CollateralParamsInput": {
+      "doc": "Collateralization parameters",
+      "fields": [
+        {
+          "doc": "Specifies what fraction of the underlying asset counts toward\nthe portfolio collateral value [0%, 100%].",
+          "name": "discount",
+          "type": "u32"
+        },
+        {
+          "doc": "The total amount of an asset the protocol accepts into the market.",
+          "name": "liq_cap",
+          "type": "i128"
+        },
+        {
+          "doc": "Liquidation order",
+          "name": "pen_order",
+          "type": "u32"
+        },
+        {
+          "name": "util_cap",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "CollateralParamsInput"
+    },
+    "DataKey": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "Admin"
+        },
+        {
+          "fields": [],
+          "name": "Reserves"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "ReserveAssetKey"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "UserConfig"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "PriceFeed"
+        },
+        {
+          "fields": [],
+          "name": "Pause"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "TokenSupply"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            },
+            {
+              "name": "_1",
+              "type": "address"
+            }
+          ],
+          "name": "TokenBalance"
+        },
+        {
+          "fields": [],
+          "name": "PoolConfig"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "ProtocolFeeVault"
+        }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 1,
+          "name": "Uninitialized"
+        },
+        {
+          "discriminant": 2,
+          "name": "Paused"
+        },
+        {
+          "discriminant": 3,
+          "name": "BellowMinValue"
+        },
+        {
+          "discriminant": 4,
+          "name": "ExceededMaxValue"
+        },
+        {
+          "discriminant": 5,
+          "name": "GracePeriod"
+        },
+        {
+          "discriminant": 100,
+          "name": "NoActiveReserve"
+        },
+        {
+          "discriminant": 101,
+          "name": "ReservesMaxCapacityExceeded"
+        },
+        {
+          "discriminant": 102,
+          "name": "NoPriceForAsset"
+        },
+        {
+          "discriminant": 103,
+          "name": "InvalidAssetPrice"
+        },
+        {
+          "discriminant": 104,
+          "name": "LiquidationOrderMustBeUnique"
+        },
+        {
+          "discriminant": 105,
+          "name": "NotFungible"
+        },
+        {
+          "discriminant": 200,
+          "name": "NotEnoughAvailableUserBalance"
+        },
+        {
+          "discriminant": 201,
+          "name": "DebtError"
+        },
+        {
+          "discriminant": 300,
+          "name": "BorrowingDisabled"
+        },
+        {
+          "discriminant": 301,
+          "name": "GoodPosition"
+        },
+        {
+          "discriminant": 302,
+          "name": "InvalidAmount"
+        },
+        {
+          "discriminant": 303,
+          "name": "ValidateBorrowMathError"
+        },
+        {
+          "discriminant": 304,
+          "name": "CalcAccountDataMathError"
+        },
+        {
+          "discriminant": 305,
+          "name": "LiquidateMathError"
+        },
+        {
+          "discriminant": 306,
+          "name": "MustNotBeInCollateralAsset"
+        },
+        {
+          "discriminant": 307,
+          "name": "FlashLoanReceiverError"
+        },
+        {
+          "discriminant": 400,
+          "name": "MathOverflowError"
+        },
+        {
+          "discriminant": 401,
+          "name": "MustBeLtePercentageFactor"
+        },
+        {
+          "discriminant": 402,
+          "name": "MustBeLtPercentageFactor"
+        },
+        {
+          "discriminant": 403,
+          "name": "MustBeGtPercentageFactor"
+        },
+        {
+          "discriminant": 404,
+          "name": "MustBeNonNegative"
+        },
+        {
+          "discriminant": 500,
+          "name": "AccruedRateMathError"
+        },
+        {
+          "discriminant": 501,
+          "name": "CollateralCoeffMathError"
+        },
+        {
+          "discriminant": 502,
+          "name": "DebtCoeffMathError"
+        }
+      ]
+    },
+    "FlashLoanAsset": {
+      "fields": [
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "borrow",
+          "type": "bool"
+        }
+      ],
+      "kind": "struct",
+      "name": "FlashLoanAsset"
+    },
+    "LiquidationAsset": {
+      "fields": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "coeff",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "comp_balance",
+          "type": "i128"
+        },
+        {
+          "name": "lp_balance",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "reserve",
+          "type": {
+            "name": "ReserveData",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidationAsset"
+    },
+    "LoanAsset": {
+      "fields": [
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "borrow",
+          "type": "bool"
+        },
+        {
+          "name": "premium",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "LoanAsset"
+    },
+    "OracleAsset": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "Stellar"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "symbol"
+            }
+          ],
+          "name": "Other"
+        }
+      ],
+      "kind": "union",
+      "name": "OracleAsset"
+    },
+    "PauseInfo": {
+      "fields": [
+        {
+          "name": "grace_period_secs",
+          "type": "u64"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        },
+        {
+          "name": "unpaused_at",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "PauseInfo"
+    },
+    "PoolConfig": {
+      "fields": [
+        {
+          "name": "base_asset_address",
+          "type": "address"
+        },
+        {
+          "name": "base_asset_decimals",
+          "type": "u32"
+        },
+        {
+          "name": "flash_loan_fee",
+          "type": "u32"
+        },
+        {
+          "name": "grace_period",
+          "type": "u64"
+        },
+        {
+          "name": "initial_health",
+          "type": "u32"
+        },
+        {
+          "name": "ir_alpha",
+          "type": "u32"
+        },
+        {
+          "name": "ir_initial_rate",
+          "type": "u32"
+        },
+        {
+          "name": "ir_max_rate",
+          "type": "u32"
+        },
+        {
+          "name": "ir_scaling_coeff",
+          "type": "u32"
+        },
+        {
+          "name": "liquidation_protocol_fee",
+          "type": "u32"
+        },
+        {
+          "name": "min_collat_amount",
+          "type": "i128"
+        },
+        {
+          "name": "min_debt_amount",
+          "type": "i128"
+        },
+        {
+          "name": "timestamp_window",
+          "type": "u64"
+        },
+        {
+          "name": "user_assets_limit",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "PoolConfig"
+    },
+    "PriceData": {
+      "fields": [
+        {
+          "name": "price",
+          "type": "i128"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceData"
+    },
+    "PriceFeed": {
+      "fields": [
+        {
+          "name": "feed",
+          "type": "address"
+        },
+        {
+          "name": "feed_asset",
+          "type": {
+            "name": "OracleAsset",
+            "type": "named"
+          }
+        },
+        {
+          "name": "feed_decimals",
+          "type": "u32"
+        },
+        {
+          "name": "min_timestamp_delta",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp_precision",
+          "type": {
+            "name": "TimestampPrecision",
+            "type": "named"
+          }
+        },
+        {
+          "name": "twap_records",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceFeed"
+    },
+    "PriceFeedConfig": {
+      "fields": [
+        {
+          "name": "asset_decimals",
+          "type": "u32"
+        },
+        {
+          "name": "feeds",
+          "type": {
+            "item": {
+              "name": "PriceFeed",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "max_sanity_price_in_base",
+          "type": "i128"
+        },
+        {
+          "name": "min_sanity_price_in_base",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceFeedConfig"
+    },
+    "PriceFeedConfigInput": {
+      "fields": [
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "asset_decimals",
+          "type": "u32"
+        },
+        {
+          "name": "feeds",
+          "type": {
+            "item": {
+              "name": "PriceFeed",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "max_sanity_price_in_base",
+          "type": "i128"
+        },
+        {
+          "name": "min_sanity_price_in_base",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceFeedConfigInput"
+    },
+    "ReserveConfiguration": {
+      "fields": [
+        {
+          "name": "borrowing_enabled",
+          "type": "bool"
+        },
+        {
+          "doc": "Specifies what fraction of the underlying asset counts toward\nthe portfolio collateral value [0%, 100%].",
+          "name": "discount",
+          "type": "u32"
+        },
+        {
+          "name": "is_active",
+          "type": "bool"
+        },
+        {
+          "name": "liquidity_cap",
+          "type": "i128"
+        },
+        {
+          "name": "pen_order",
+          "type": "u32"
+        },
+        {
+          "name": "util_cap",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "ReserveConfiguration"
+    },
+    "ReserveData": {
+      "fields": [
+        {
+          "name": "borrower_ar",
+          "type": "i128"
+        },
+        {
+          "name": "borrower_ir",
+          "type": "i128"
+        },
+        {
+          "name": "configuration",
+          "type": {
+            "name": "ReserveConfiguration",
+            "type": "named"
+          }
+        },
+        {
+          "doc": "The id of the reserve (position in the list of the active reserves).",
+          "name": "id",
+          "type": {
+            "size": 1,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "last_update_timestamp",
+          "type": "u64"
+        },
+        {
+          "name": "lender_ar",
+          "type": "i128"
+        },
+        {
+          "name": "lender_ir",
+          "type": "i128"
+        },
+        {
+          "name": "reserve_type",
+          "type": {
+            "name": "ReserveType",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "ReserveData"
+    },
+    "ReserveType": {
+      "cases": [
+        {
+          "doc": "Fungible reserve for which created sToken and debtToken",
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            },
+            {
+              "name": "_1",
+              "type": "address"
+            }
+          ],
+          "name": "Fungible"
+        },
+        {
+          "doc": "RWA reserve",
+          "fields": [],
+          "name": "RWA"
+        }
+      ],
+      "kind": "union",
+      "name": "ReserveType"
+    },
+    "TimestampPrecision": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "Msec"
+        },
+        {
+          "fields": [],
+          "name": "Sec"
+        }
+      ],
+      "kind": "union",
+      "name": "TimestampPrecision"
+    },
+    "UserConfiguration": {
+      "fields": [
+        {
+          "name": "0",
+          "type": "u128"
+        },
+        {
+          "name": "1",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "UserConfiguration"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAABQAAAAAAAAAAAAAAEEluaXRpYWxpemVkRXZlbnQAAAABAAAACmluaXRpYWxpemUAAAAAAA8AAAAAAAAABWFkbWluAAAAAAAAEwAAAAEAAAAAAAAAEmJhc2VfYXNzZXRfYWRkcmVzcwAAAAAAEwAAAAEAAAAAAAAACGlyX2FscGhhAAAABAAAAAAAAAAAAAAAD2lyX2luaXRpYWxfcmF0ZQAAAAAEAAAAAAAAAAAAAAALaXJfbWF4X3JhdGUAAAAABAAAAAAAAAAAAAAAEGlyX3NjYWxpbmdfY29lZmYAAAAEAAAAAAAAAAAAAAATYmFzZV9hc3NldF9kZWNpbWFscwAAAAAEAAAAAAAAAAAAAAAOaW5pdGlhbF9oZWFsdGgAAAAAAAQAAAAAAAAAAAAAAAxncmFjZV9wZXJpb2QAAAAGAAAAAAAAAAAAAAAQdGltZXN0YW1wX3dpbmRvdwAAAAYAAAAAAAAAAAAAAA5mbGFzaF9sb2FuX2ZlZQAAAAAABAAAAAAAAAAAAAAAEXVzZXJfYXNzZXRzX2xpbWl0AAAAAAAABAAAAAAAAAAAAAAAEW1pbl9jb2xsYXRfYW1vdW50AAAAAAAACwAAAAAAAAAAAAAAD21pbl9kZWJ0X2Ftb3VudAAAAAALAAAAAAAAAAAAAAAYbGlxdWlkYXRpb25fcHJvdG9jb2xfZmVlAAAABAAAAAAAAAAC",
+    "AAAABQAAAAAAAAAAAAAAHVJlc2VydmVVc2VkQXNDb2xsRW5hYmxlZEV2ZW50AAAAAAAAAQAAABxyZXNlcnZlX3VzZWRfYXNfY29sbF9lbmFibGVkAAAAAgAAAAAAAAADd2hvAAAAABMAAAABAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAAAA==",
+    "AAAABQAAAAAAAAAAAAAAHlJlc2VydmVVc2VkQXNDb2xsRGlzYWJsZWRFdmVudAAAAAAAAQAAAB1yZXNlcnZlX3VzZWRfYXNfY29sbF9kaXNhYmxlZAAAAAAAAAIAAAAAAAAAA3dobwAAAAATAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAA=",
+    "AAAABQAAAAAAAAAAAAAADERlcG9zaXRFdmVudAAAAAEAAAAHZGVwb3NpdAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAC",
+    "AAAABQAAAAAAAAAAAAAADVdpdGhkcmF3RXZlbnQAAAAAAAABAAAACHdpdGhkcmF3AAAABAAAAAAAAAADd2hvAAAAABMAAAABAAAAAAAAAAJ0bwAAAAAAEwAAAAAAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAC",
+    "AAAABQAAAAAAAAAAAAAAC0JvcnJvd0V2ZW50AAAAAAEAAAAGYm9ycm93AAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAC",
+    "AAAABQAAAAAAAAAAAAAAClJlcGF5RXZlbnQAAAAAAAEAAAAFcmVwYXkAAAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAC",
+    "AAAABQAAAAAAAAAAAAAAF0NvbGxhdENvbmZpZ0NoYW5nZUV2ZW50AAAAAAEAAAAUY29sbGF0X2NvbmZpZ19jaGFuZ2UAAAAFAAAAAAAAAAVhc3NldAAAAAAAABMAAAABAAAAAAAAAAdsaXFfY2FwAAAAAAsAAAAAAAAAAAAAAAlwZW5fb3JkZXIAAAAAAAAEAAAAAAAAAAAAAAAIdXRpbF9jYXAAAAAEAAAAAAAAAAAAAAAIZGlzY291bnQAAAAEAAAAAAAAAAI=",
+    "AAAABQAAAAAAAAAAAAAAFUJvcnJvd2luZ0VuYWJsZWRFdmVudAAAAAAAAAEAAAARYm9ycm93aW5nX2VuYWJsZWQAAAAAAAABAAAAAAAAAAVhc3NldAAAAAAAABMAAAABAAAAAA==",
+    "AAAABQAAAAAAAAAAAAAAFkJvcnJvd2luZ0Rpc2FibGVkRXZlbnQAAAAAAAEAAAASYm9ycm93aW5nX2Rpc2FibGVkAAAAAAABAAAAAAAAAAVhc3NldAAAAAAAABMAAAABAAAAAA==",
+    "AAAABQAAAAAAAAAAAAAAGVJlc2VydmVTdGF0dXNDaGFuZ2VkRXZlbnQAAAAAAAABAAAAFnJlc2VydmVfc3RhdHVzX2NoYW5nZWQAAAAAAAIAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAAAAAAACWFjdGl2YXRlZAAAAAAAAAEAAAAAAAAAAA==",
+    "AAAABQAAAAAAAAAAAAAAEExpcXVpZGF0aW9uRXZlbnQAAAABAAAAC2xpcXVpZGF0aW9uAAAAAAMAAAAAAAAAA3dobwAAAAATAAAAAQAAAAAAAAAMY292ZXJlZF9kZWJ0AAAACwAAAAAAAAAAAAAAFWxpcXVpZGF0ZWRfY29sbGF0ZXJhbAAAAAAAAAsAAAAAAAAAAg==",
+    "AAAABQAAAAAAAAAAAAAADkZsYXNoTG9hbkV2ZW50AAAAAAABAAAACmZsYXNoX2xvYW4AAAAAAAYAAAAAAAAAA3dobwAAAAATAAAAAQAAAAAAAAAIcmVjZWl2ZXIAAAATAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAAAAAAAHcHJlbWl1bQAAAAALAAAAAAAAAAAAAAAGYm9ycm93AAAAAAABAAAAAAAAAAI=",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAACgAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAAIUmVzZXJ2ZXMAAAABAAAAAAAAAA9SZXNlcnZlQXNzZXRLZXkAAAAAAQAAABMAAAABAAAAAAAAAApVc2VyQ29uZmlnAAAAAAABAAAAEwAAAAEAAAAAAAAACVByaWNlRmVlZAAAAAAAAAEAAAATAAAAAAAAAAAAAAAFUGF1c2UAAAAAAAABAAAAAAAAAAtUb2tlblN1cHBseQAAAAABAAAAEwAAAAEAAAAAAAAADFRva2VuQmFsYW5jZQAAAAIAAAATAAAAEwAAAAAAAAAAAAAAClBvb2xDb25maWcAAAAAAAEAAAAAAAAAEFByb3RvY29sRmVlVmF1bHQAAAABAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAEExpcXVpZGF0aW9uQXNzZXQAAAAFAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAABWNvZWZmAAAAAAAD6AAAAAsAAAAAAAAADGNvbXBfYmFsYW5jZQAAAAsAAAAAAAAACmxwX2JhbGFuY2UAAAAAA+gAAAALAAAAAAAAAAdyZXNlcnZlAAAAB9AAAAALUmVzZXJ2ZURhdGEA",
+    "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAtwb29sX2NvbmZpZwAAAAfQAAAAClBvb2xDb25maWcAAAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAANdXBncmFkZV90b2tlbgAAAAAAAAMAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAHc190b2tlbgAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAHdmVyc2lvbgAAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAMaW5pdF9yZXNlcnZlAAAAAgAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAxyZXNlcnZlX3R5cGUAAAfQAAAAC1Jlc2VydmVUeXBlAAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAASc2V0X3Jlc2VydmVfc3RhdHVzAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAACWlzX2FjdGl2ZQAAAAAAAAEAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAbZW5hYmxlX2JvcnJvd2luZ19vbl9yZXNlcnZlAAAAAAIAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAHZW5hYmxlZAAAAAABAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAXY29uZmlndXJlX2FzX2NvbGxhdGVyYWwAAAAAAgAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZwYXJhbXMAAAAAB9AAAAAVQ29sbGF0ZXJhbFBhcmFtc0lucHV0AAAAAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAALZ2V0X3Jlc2VydmUAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAA+gAAAfQAAAAC1Jlc2VydmVEYXRhAA==",
+    "AAAAAAAAAAAAAAAMY29sbGF0X2NvZWZmAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAA+kAAAALAAAAAw==",
+    "AAAAAAAAAAAAAAAKZGVidF9jb2VmZgAAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAA+kAAAALAAAAAw==",
+    "AAAAAAAAAAAAAAAWc2V0X3Bvb2xfY29uZmlndXJhdGlvbgAAAAAAAQAAAAAAAAAGY29uZmlnAAAAAAfQAAAAClBvb2xDb25maWcAAAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAScG9vbF9jb25maWd1cmF0aW9uAAAAAAAAAAAAAQAAA+kAAAfQAAAAClBvb2xDb25maWcAAAAAAAM=",
+    "AAAAAAAAAAAAAAAPc2V0X3ByaWNlX2ZlZWRzAAAAAAEAAAAAAAAABmlucHV0cwAAAAAD6gAAB9AAAAAUUHJpY2VGZWVkQ29uZmlnSW5wdXQAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAALcHJpY2VfZmVlZHMAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAA+gAAAfQAAAAD1ByaWNlRmVlZENvbmZpZwA=",
+    "AAAAAAAAAAAAAAAHZGVwb3NpdAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAFcmVwYXkAAAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAARZmluYWxpemVfdHJhbnNmZXIAAAAAAAAHAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAABGZyb20AAAATAAAAAAAAAAJ0bwAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAABNiYWxhbmNlX2Zyb21fYmVmb3JlAAAAAAsAAAAAAAAAEWJhbGFuY2VfdG9fYmVmb3JlAAAAAAAACwAAAAAAAAAOc190b2tlbl9zdXBwbHkAAAAAAAsAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAId2l0aGRyYXcAAAAEAAAAAAAAAAN3aG8AAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAAAnRvAAAAAAATAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAGYm9ycm93AAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAJc2V0X3BhdXNlAAAAAAAAAQAAAAAAAAAFdmFsdWUAAAAAAAABAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAKcGF1c2VfaW5mbwAAAAAAAAAAAAEAAAfQAAAACVBhdXNlSW5mbwAAAA==",
+    "AAAAAAAAAAAAAAAQYWNjb3VudF9wb3NpdGlvbgAAAAEAAAAAAAAAA3dobwAAAAATAAAAAQAAA+kAAAfQAAAAD0FjY291bnRQb3NpdGlvbgAAAAAD",
+    "AAAAAAAAAAAAAAAJbGlxdWlkYXRlAAAAAAAAAgAAAAAAAAAKbGlxdWlkYXRvcgAAAAAAEwAAAAAAAAADd2hvAAAAABMAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAARc2V0X2FzX2NvbGxhdGVyYWwAAAAAAAADAAAAAAAAAAN3aG8AAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAABF1c2VfYXNfY29sbGF0ZXJhbAAAAAAAAAEAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAASdXNlcl9jb25maWd1cmF0aW9uAAAAAAABAAAAAAAAAAN3aG8AAAAAEwAAAAEAAAPpAAAH0AAAABFVc2VyQ29uZmlndXJhdGlvbgAAAAAAAAM=",
+    "AAAAAAAAAAAAAAANdG9rZW5fYmFsYW5jZQAAAAAAAAIAAAAAAAAABXRva2VuAAAAAAAAEwAAAAAAAAAHYWNjb3VudAAAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAASdG9rZW5fdG90YWxfc3VwcGx5AAAAAAABAAAAAAAAAAV0b2tlbgAAAAAAABMAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAKZmxhc2hfbG9hbgAAAAAABAAAAAAAAAADd2hvAAAAABMAAAAAAAAACHJlY2VpdmVyAAAAEwAAAAAAAAALbG9hbl9hc3NldHMAAAAD6gAAB9AAAAAORmxhc2hMb2FuQXNzZXQAAAAAAAAAAAAGcGFyYW1zAAAAAAAOAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAARdHdhcF9tZWRpYW5fcHJpY2UAAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAACwAAAAM=",
+    "AAAAAAAAAAAAAAAMcHJvdG9jb2xfZmVlAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAASY2xhaW1fcHJvdG9jb2xfZmVlAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAQAAAAAAAAAAAAAACUxvYW5Bc3NldAAAAAAAAAQAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZib3Jyb3cAAAAAAAEAAAAAAAAAB3ByZW1pdW0AAAAACw==",
+    "AAAAAQAAAAAAAAAAAAAAD0FjY291bnRQb3NpdGlvbgAAAAADAAAAAAAAAARkZWJ0AAAACwAAAAAAAAAVZGlzY291bnRlZF9jb2xsYXRlcmFsAAAAAAAACwAAAAAAAAADbnB2AAAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAADEFzc2V0QmFsYW5jZQAAAAIAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAHYmFsYW5jZQAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAAD0Jhc2VBc3NldENvbmZpZwAAAAACAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAACGRlY2ltYWxzAAAABA==",
+    "AAAAAQAAABxDb2xsYXRlcmFsaXphdGlvbiBwYXJhbWV0ZXJzAAAAAAAAABVDb2xsYXRlcmFsUGFyYW1zSW5wdXQAAAAAAAAEAAAAaFNwZWNpZmllcyB3aGF0IGZyYWN0aW9uIG9mIHRoZSB1bmRlcmx5aW5nIGFzc2V0IGNvdW50cyB0b3dhcmQKdGhlIHBvcnRmb2xpbyBjb2xsYXRlcmFsIHZhbHVlIFswJSwgMTAwJV0uAAAACGRpc2NvdW50AAAABAAAAEJUaGUgdG90YWwgYW1vdW50IG9mIGFuIGFzc2V0IHRoZSBwcm90b2NvbCBhY2NlcHRzIGludG8gdGhlIG1hcmtldC4AAAAAAAdsaXFfY2FwAAAAAAsAAAARTGlxdWlkYXRpb24gb3JkZXIAAAAAAAAJcGVuX29yZGVyAAAAAAAABAAAAAAAAAAIdXRpbF9jYXAAAAAE",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAHgAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAAAAAAAAAAAAAA1VbmluaXRpYWxpemVkAAAAAAAAAQAAAAAAAAAGUGF1c2VkAAAAAAACAAAAAAAAAA5CZWxsb3dNaW5WYWx1ZQAAAAAAAwAAAAAAAAAQRXhjZWVkZWRNYXhWYWx1ZQAAAAQAAAAAAAAAC0dyYWNlUGVyaW9kAAAAAAUAAAAAAAAAD05vQWN0aXZlUmVzZXJ2ZQAAAABkAAAAAAAAABtSZXNlcnZlc01heENhcGFjaXR5RXhjZWVkZWQAAAAAZQAAAAAAAAAPTm9QcmljZUZvckFzc2V0AAAAAGYAAAAAAAAAEUludmFsaWRBc3NldFByaWNlAAAAAAAAZwAAAAAAAAAcTGlxdWlkYXRpb25PcmRlck11c3RCZVVuaXF1ZQAAAGgAAAAAAAAAC05vdEZ1bmdpYmxlAAAAAGkAAAAAAAAAHU5vdEVub3VnaEF2YWlsYWJsZVVzZXJCYWxhbmNlAAAAAAAAyAAAAAAAAAAJRGVidEVycm9yAAAAAAAAyQAAAAAAAAARQm9ycm93aW5nRGlzYWJsZWQAAAAAAAEsAAAAAAAAAAxHb29kUG9zaXRpb24AAAEtAAAAAAAAAA1JbnZhbGlkQW1vdW50AAAAAAABLgAAAAAAAAAXVmFsaWRhdGVCb3Jyb3dNYXRoRXJyb3IAAAABLwAAAAAAAAAYQ2FsY0FjY291bnREYXRhTWF0aEVycm9yAAABMAAAAAAAAAASTGlxdWlkYXRlTWF0aEVycm9yAAAAAAExAAAAAAAAABpNdXN0Tm90QmVJbkNvbGxhdGVyYWxBc3NldAAAAAABMgAAAAAAAAAWRmxhc2hMb2FuUmVjZWl2ZXJFcnJvcgAAAAABMwAAAAAAAAARTWF0aE92ZXJmbG93RXJyb3IAAAAAAAGQAAAAAAAAABlNdXN0QmVMdGVQZXJjZW50YWdlRmFjdG9yAAAAAAABkQAAAAAAAAAYTXVzdEJlTHRQZXJjZW50YWdlRmFjdG9yAAABkgAAAAAAAAAYTXVzdEJlR3RQZXJjZW50YWdlRmFjdG9yAAABkwAAAAAAAAARTXVzdEJlTm9uTmVnYXRpdmUAAAAAAAGUAAAAAAAAABRBY2NydWVkUmF0ZU1hdGhFcnJvcgAAAfQAAAAAAAAAGENvbGxhdGVyYWxDb2VmZk1hdGhFcnJvcgAAAfUAAAAAAAAAEkRlYnRDb2VmZk1hdGhFcnJvcgAAAAAB9g==",
+    "AAAAAQAAAAAAAAAAAAAADkZsYXNoTG9hbkFzc2V0AAAAAAADAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAGYm9ycm93AAAAAAAB",
+    "AAAAAgAAAAAAAAAAAAAAC09yYWNsZUFzc2V0AAAAAAIAAAABAAAAAAAAAAdTdGVsbGFyAAAAAAEAAAATAAAAAQAAAAAAAAAFT3RoZXIAAAAAAAABAAAAEQ==",
+    "AAAAAQAAAAAAAAAAAAAACVBhdXNlSW5mbwAAAAAAAAMAAAAAAAAAEWdyYWNlX3BlcmlvZF9zZWNzAAAAAAAABgAAAAAAAAAGcGF1c2VkAAAAAAABAAAAAAAAAAt1bnBhdXNlZF9hdAAAAAAG",
+    "AAAAAQAAAAAAAAAAAAAAClBvb2xDb25maWcAAAAAAA4AAAAAAAAAEmJhc2VfYXNzZXRfYWRkcmVzcwAAAAAAEwAAAAAAAAATYmFzZV9hc3NldF9kZWNpbWFscwAAAAAEAAAAAAAAAA5mbGFzaF9sb2FuX2ZlZQAAAAAABAAAAAAAAAAMZ3JhY2VfcGVyaW9kAAAABgAAAAAAAAAOaW5pdGlhbF9oZWFsdGgAAAAAAAQAAAAAAAAACGlyX2FscGhhAAAABAAAAAAAAAAPaXJfaW5pdGlhbF9yYXRlAAAAAAQAAAAAAAAAC2lyX21heF9yYXRlAAAAAAQAAAAAAAAAEGlyX3NjYWxpbmdfY29lZmYAAAAEAAAAAAAAABhsaXF1aWRhdGlvbl9wcm90b2NvbF9mZWUAAAAEAAAAAAAAABFtaW5fY29sbGF0X2Ftb3VudAAAAAAAAAsAAAAAAAAAD21pbl9kZWJ0X2Ftb3VudAAAAAALAAAAAAAAABB0aW1lc3RhbXBfd2luZG93AAAABgAAAAAAAAARdXNlcl9hc3NldHNfbGltaXQAAAAAAAAE",
+    "AAAAAQAAAAAAAAAAAAAACVByaWNlRmVlZAAAAAAAAAYAAAAAAAAABGZlZWQAAAATAAAAAAAAAApmZWVkX2Fzc2V0AAAAAAfQAAAAC09yYWNsZUFzc2V0AAAAAAAAAAANZmVlZF9kZWNpbWFscwAAAAAAAAQAAAAAAAAAE21pbl90aW1lc3RhbXBfZGVsdGEAAAAABgAAAAAAAAATdGltZXN0YW1wX3ByZWNpc2lvbgAAAAfQAAAAElRpbWVzdGFtcFByZWNpc2lvbgAAAAAAAAAAAAx0d2FwX3JlY29yZHMAAAAE",
+    "AAAAAQAAAAAAAAAAAAAAD1ByaWNlRmVlZENvbmZpZwAAAAAEAAAAAAAAAA5hc3NldF9kZWNpbWFscwAAAAAABAAAAAAAAAAFZmVlZHMAAAAAAAPqAAAH0AAAAAlQcmljZUZlZWQAAAAAAAAAAAAAGG1heF9zYW5pdHlfcHJpY2VfaW5fYmFzZQAAAAsAAAAAAAAAGG1pbl9zYW5pdHlfcHJpY2VfaW5fYmFzZQAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAAFFByaWNlRmVlZENvbmZpZ0lucHV0AAAABQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAA5hc3NldF9kZWNpbWFscwAAAAAABAAAAAAAAAAFZmVlZHMAAAAAAAPqAAAH0AAAAAlQcmljZUZlZWQAAAAAAAAAAAAAGG1heF9zYW5pdHlfcHJpY2VfaW5fYmFzZQAAAAsAAAAAAAAAGG1pbl9zYW5pdHlfcHJpY2VfaW5fYmFzZQAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAAFFJlc2VydmVDb25maWd1cmF0aW9uAAAABgAAAAAAAAARYm9ycm93aW5nX2VuYWJsZWQAAAAAAAABAAAAaFNwZWNpZmllcyB3aGF0IGZyYWN0aW9uIG9mIHRoZSB1bmRlcmx5aW5nIGFzc2V0IGNvdW50cyB0b3dhcmQKdGhlIHBvcnRmb2xpbyBjb2xsYXRlcmFsIHZhbHVlIFswJSwgMTAwJV0uAAAACGRpc2NvdW50AAAABAAAAAAAAAAJaXNfYWN0aXZlAAAAAAAAAQAAAAAAAAANbGlxdWlkaXR5X2NhcAAAAAAAAAsAAAAAAAAACXBlbl9vcmRlcgAAAAAAAAQAAAAAAAAACHV0aWxfY2FwAAAABA==",
+    "AAAAAQAAAAAAAAAAAAAAC1Jlc2VydmVEYXRhAAAAAAgAAAAAAAAAC2JvcnJvd2VyX2FyAAAAAAsAAAAAAAAAC2JvcnJvd2VyX2lyAAAAAAsAAAAAAAAADWNvbmZpZ3VyYXRpb24AAAAAAAfQAAAAFFJlc2VydmVDb25maWd1cmF0aW9uAAAARFRoZSBpZCBvZiB0aGUgcmVzZXJ2ZSAocG9zaXRpb24gaW4gdGhlIGxpc3Qgb2YgdGhlIGFjdGl2ZSByZXNlcnZlcykuAAAAAmlkAAAAAAPuAAAAAQAAAAAAAAAVbGFzdF91cGRhdGVfdGltZXN0YW1wAAAAAAAABgAAAAAAAAAJbGVuZGVyX2FyAAAAAAAACwAAAAAAAAAJbGVuZGVyX2lyAAAAAAAACwAAAAAAAAAMcmVzZXJ2ZV90eXBlAAAH0AAAAAtSZXNlcnZlVHlwZQA=",
+    "AAAAAgAAAAAAAAAAAAAAC1Jlc2VydmVUeXBlAAAAAAIAAAABAAAAN0Z1bmdpYmxlIHJlc2VydmUgZm9yIHdoaWNoIGNyZWF0ZWQgc1Rva2VuIGFuZCBkZWJ0VG9rZW4AAAAACEZ1bmdpYmxlAAAAAgAAABMAAAATAAAAAAAAAAtSV0EgcmVzZXJ2ZQAAAAADUldBAA==",
+    "AAAAAgAAAAAAAAAAAAAAElRpbWVzdGFtcFByZWNpc2lvbgAAAAAAAgAAAAAAAAAAAAAABE1zZWMAAAAAAAAAAAAAAANTZWMA",
+    "AAAAAQAAAAAAAAAAAAAAEVVzZXJDb25maWd1cmF0aW9uAAAAAAAAAgAAAAAAAAABMAAAAAAAAAoAAAAAAAAAATEAAAAAAAAE",
+    "AAAAAgAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAAAEAAAAAAAAAB1N0ZWxsYXIAAAAAAQAAABMAAAABAAAAAAAAAAVPdGhlcgAAAAAAAAEAAAAR",
+    "AAAAAQAAAAAAAAAAAAAACVByaWNlRGF0YQAAAAAAAAIAAAAAAAAABXByaWNlAAAAAAAACwAAAAAAAAAJdGltZXN0YW1wAAAAAAAABg=="
+  ]
+}
