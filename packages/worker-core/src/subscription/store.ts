@@ -11,6 +11,11 @@ export interface SubscriptionStore {
   listBySubscriber(subscriber: string): Promise<SubscriptionRecord[]>;
 }
 
+/**
+ * In-memory {@link SubscriptionStore} for tests and single-process
+ * development. Holds records in a `Map`; nothing survives a restart, so
+ * production deployments use a durable store behind the same interface.
+ */
 export class MemorySubscriptionStore implements SubscriptionStore {
   private readonly records = new Map<string, SubscriptionRecord>();
 

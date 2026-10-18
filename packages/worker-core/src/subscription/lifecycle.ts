@@ -26,6 +26,11 @@ import type { BillingHooks, ExpiringSubscriptionEvent, SubscriptionEvent } from 
 import { NOOP_BILLING_HOOKS } from "./billing.js";
 import type { CoverageLedger, CoverageReason, CoverageWindow } from "./coverage.js";
 
+/**
+ * Backstop-subscription lifecycle state. `active` is covered, `expiring` is
+ * covered but inside the lapse-notice window, `lapsed` and `cancelled` are
+ * not covered; see {@link LEGAL_TRANSITIONS} for which moves are allowed.
+ */
 export type SubscriptionState = "active" | "expiring" | "lapsed" | "cancelled";
 
 /**
@@ -66,6 +71,7 @@ export function isLegalTransition(from: SubscriptionState, to: SubscriptionState
   return LEGAL_TRANSITIONS[from].includes(to);
 }
 
+/** Reasons a lifecycle transition is refused. Typed so a caller can branch. */
 export type SubscriptionLifecycleErrorCode =
   | "ILLEGAL_TRANSITION"
   | "LEDGER_NOT_ADVANCING"
@@ -75,6 +81,13 @@ export type SubscriptionLifecycleErrorCode =
   | "PREMATURE_LAPSE"
   | "MISSING_FIELD";
 
+/**
+ * Thrown when a backstop-subscription transition is refused - an illegal
+ * state move, a ledger that is not advancing or out of range, or a lapse
+ * attempted without the promised notice. Carries a
+ * {@link SubscriptionLifecycleErrorCode} in `code` so callers branch on the
+ * cause rather than parsing the message.
+ */
 export class SubscriptionLifecycleError extends Error {
   readonly code: SubscriptionLifecycleErrorCode;
 
@@ -85,6 +98,12 @@ export class SubscriptionLifecycleError extends Error {
   }
 }
 
+/**
+ * Construction parameters for a {@link BackstopSubscription}: the identity of
+ * the subscription, the backstop tier, the window length in ledgers that the
+ * lapse-notice and stop-coverage guarantees are stated in, and the starting
+ * ledger.
+ */
 export type BackstopSubscriptionConfig = {
   subscriptionId: string;
   /**

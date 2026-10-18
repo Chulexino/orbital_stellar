@@ -7,6 +7,12 @@ export type SubscriptionErrorCode =
   | "TIER_NOT_REGISTRABLE"
   | "INVALID_FIELD";
 
+/**
+ * Thrown when a subscription operation is refused - an unknown or disabled
+ * tier, a webhook target the SSRF guard rejects, or an illegal lifecycle
+ * action. Carries a {@link SubscriptionErrorCode} in `code` so callers
+ * branch on the cause rather than parsing the message.
+ */
 export class SubscriptionError extends Error {
   constructor(
     public readonly code: SubscriptionErrorCode,

@@ -59,6 +59,12 @@ export interface SubscriptionAuditEntry {
   readonly reason?: string;
 }
 
+/**
+ * The stored form of one subscription: identity, versioned tier promise,
+ * lifecycle status, delivery target and the append-only audit trail. The
+ * `version` bumps only on a tier change, so what was promised in any past
+ * window stays answerable from the record alone.
+ */
 export interface SubscriptionRecord {
   readonly id: string;
   /**

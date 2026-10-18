@@ -11,6 +11,11 @@ import type {
   SubscriptionTier,
 } from "./types.js";
 
+/**
+ * Dependencies and injectable seams for {@link SubscriptionService}: the
+ * record store, the SSRF guard for subscriber-supplied webhook targets, and
+ * the clock / id / current-window functions tests override.
+ */
 export interface SubscriptionServiceOptions {
   store: SubscriptionStore;
   /**
@@ -28,6 +33,11 @@ export interface SubscriptionServiceOptions {
   currentWindow: () => number;
 }
 
+/**
+ * What a subscriber supplies to open a subscription: who is subscribing, to
+ * which offering, at which tier, and where fire/miss notifications should be
+ * delivered. The webhook target is validated before anything is stored.
+ */
 export interface CreateSubscriptionInput {
   subscriber: string;
   offering: string;

@@ -58,9 +58,16 @@ export interface CoverageLedger {
   history(subscriptionId: string): Promise<CoverageWindow[]>;
 }
 
+/** Reasons the coverage ledger refuses a record. Typed so a caller can branch. */
 export type CoverageLedgerErrorCode =
   "LEDGER_OUT_OF_RANGE" | "EMPTY_WINDOW" | "OVERLAPPING_WINDOW" | "INCONSISTENT_REASON";
 
+/**
+ * Thrown when a coverage window cannot be recorded or queried - an invalid
+ * ledger range, an empty or overlapping window, or a reason that contradicts
+ * the record. Carries a {@link CoverageLedgerErrorCode} in `code` so callers
+ * branch on the cause rather than parsing the message.
+ */
 export class CoverageLedgerError extends Error {
   readonly code: CoverageLedgerErrorCode;
 

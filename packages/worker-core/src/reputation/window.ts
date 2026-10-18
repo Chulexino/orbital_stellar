@@ -33,6 +33,11 @@ export interface Verdict {
   latencyMs: number;
 }
 
+/**
+ * The verdicts selected for one operator over one scoring window
+ * `[windowStart, windowEnd]`, sorted ascending by time - the input
+ * {@link computeWindowMetrics} folds into {@link WindowMetrics}.
+ */
 export interface WindowSelection {
   operatorId: string;
   windowStart: number;
@@ -42,6 +47,11 @@ export interface WindowSelection {
   verdicts: Verdict[];
 }
 
+/**
+ * Aggregates folded from a {@link WindowSelection}: sample counts,
+ * availability and miss rate in `[0, 1]`, and latency percentiles - the raw
+ * material the reputation score is computed from.
+ */
 export interface WindowMetrics {
   operatorId: string;
   windowStart: number;
