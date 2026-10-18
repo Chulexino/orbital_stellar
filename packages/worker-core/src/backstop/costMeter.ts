@@ -40,6 +40,11 @@ export interface CostBreakdown {
   storageByteLedgers: number;
 }
 
+/**
+ * Creates a {@link CostBreakdown} with all cost drivers initialized to zero.
+ *
+ * @returns An empty cost breakdown object.
+ */
 export function emptyCostBreakdown(): CostBreakdown {
   return {
     rpcCalls: 0,
@@ -159,6 +164,9 @@ export interface MarginalCostReport {
   newCondition: MarginalCostEstimate | null;
 }
 
+/**
+ * Specific error codes describing failure conditions in cost metering and aggregation operations.
+ */
 export type CostMeterErrorCode =
   | "NO_SUBSCRIPTIONS"
   | "NEGATIVE_VALUE"
@@ -166,9 +174,19 @@ export type CostMeterErrorCode =
   | "WINDOW_NOT_ADVANCING"
   | "UNKNOWN_SUBSCRIPTION";
 
+/**
+ * Thrown when an invalid argument, unexpected subscription state, or invalid ledger window is encountered during cost metering.
+ */
 export class CostMeterError extends Error {
+  /** The programmatic error code for this error. */
   readonly code: CostMeterErrorCode;
 
+  /**
+   * Initializes a new instance of {@link CostMeterError}.
+   *
+   * @param code - The specific error code.
+   * @param message - Descriptive error message.
+   */
   constructor(code: CostMeterErrorCode, message: string) {
     super(message);
     this.name = "CostMeterError";
