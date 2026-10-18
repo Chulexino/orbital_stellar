@@ -1,5 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { Sep31Client, MissingFieldsError, CustomerInfoNeededError } from "../src/sep31.js";
+import { ZodError } from "zod";
 import { Sep12Client } from "../src/sep12.js";
 import { Sep31StatusMachine, InvalidStatusTransitionError } from "../src/statusMachine.js";
 
@@ -272,39 +273,126 @@ describe("SEP-31 error classes", () => {
 
 describe("SEP-12 Customer Info", () => {
   let client: Sep12Client;
+  let fetchMock: ReturnType<typeof vi.fn<typeof fetch>>;
 
   beforeEach(() => {
     client = new Sep12Client(mockAnchorUrl);
-    vi.stubGlobal("fetch", vi.fn());
+    fetchMock = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.useFakeTimers();
   });
 
-  it("gets customer info", async () => {
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        id: "cust123",
-        status: "ACCEPTED",
-        provided_fields: {
-          first_name: { description: "First Name", status: "ACCEPTED" },
-        },
-      }),
-    });
-
-    const res = await client.getCustomer({ type: "sender", account: "GABC..." }, "token");
-    expect(res.id).toBe("cust123");
-    expect(res.status).toBe("ACCEPTED");
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
-  it("puts customer info", async () => {
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => ({ id: "cust123" }),
-    });
+  it("gets customer info with encoded lookup parameters and bearer authorization", async () => {
+    const customer = {
+      id: "cust123",
+      status: "NEEDS_INFO",
+      provided_fields: {
+        first_name: { description: "First Name", type: "string", status: "ACCEPTED" },
+        email_address: { status: "REJECTED", error: "Invalid email" },
+      },
+      fields: { last_name: { type: "string", description: "Last Name" } },
+      message: "Provide your last name",
+    };
+    fetchMock.mockResolvedValue(Response.json(customer));
+    const params = { type: "sender", account: "GABC", memo: "customer +&/?", memo_type: "text" };
 
+    await expect(client.getCustomer(params, "token")).resolves.toEqual(customer);
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+      `${mockAnchorUrl}/customer?type=sender&account=GABC&memo=customer+%2B%26%2F%3F&memo_type=text`,
+      { method: "GET", headers: { Authorization: "Bearer token" } },
+    );
+  });
+
+  it.each(["ACCEPTED", "PROCESSING", "NEEDS_INFO", "REJECTED"])(
+    "accepts a minimal %s lookup response without optional fields or query parameters",
+    async (status) => {
+      fetchMock.mockResolvedValue(Response.json({ status }));
+
+      await expect(client.getCustomer({}, "token")).resolves.toEqual({ status });
+      expect(fetchMock).toHaveBeenCalledExactlyOnceWith(`${mockAnchorUrl}/customer`, {
+        method: "GET",
+        headers: { Authorization: "Bearer token" },
+      });
+    },
+  );
+
+  it.each([
+    ["missing status", {}],
+    ["unknown status", { status: "UNKNOWN" }],
+    ["invalid id", { status: "ACCEPTED", id: 123 }],
+    [
+      "invalid provided field status",
+      { status: "NEEDS_INFO", provided_fields: { name: { status: "UNKNOWN" } } },
+    ],
+    ["incomplete requested field", { status: "NEEDS_INFO", fields: { name: { type: "string" } } }],
+  ])("rejects a schema-invalid lookup response: %s", async (_label, body) => {
+    fetchMock.mockResolvedValue(Response.json(body));
+
+    await expect(client.getCustomer({ id: "cust123" }, "token")).rejects.toBeInstanceOf(ZodError);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("puts customer info as FormData and returns the assigned id", async () => {
+    fetchMock.mockResolvedValue(Response.json({ id: "cust123" }, { status: 202 }));
     const formData = new FormData();
+    formData.append("id", "cust123");
     formData.append("first_name", "Alice");
 
-    const res = await client.putCustomer(formData, "token");
-    expect(res.id).toBe("cust123");
+    await expect(client.putCustomer(formData, "token")).resolves.toEqual({ id: "cust123" });
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(`${mockAnchorUrl}/customer`, {
+      method: "PUT",
+      headers: { Authorization: "Bearer token" },
+      body: formData,
+    });
+  });
+
+  it.each([{}, { id: 123 }, null])("rejects a schema-invalid update response: %j", async (body) => {
+    fetchMock.mockResolvedValue(Response.json(body));
+
+    await expect(client.putCustomer(new FormData(), "token")).rejects.toBeInstanceOf(ZodError);
+  });
+
+  describe.each(["GET", "PUT"])("%s failures", (method) => {
+    function request() {
+      return method === "GET"
+        ? client.getCustomer({}, "token")
+        : client.putCustomer(new FormData(), "token");
+    }
+
+    it.each([
+      [400, "Bad Request"],
+      [401, "Unauthorized"],
+      [404, "Not Found"],
+      [500, "Internal Server Error"],
+    ])("rejects HTTP %i before trying to parse the body", async (status, statusText) => {
+      const response = new Response("not JSON", { status, statusText });
+      const json = vi.spyOn(response, "json");
+      fetchMock.mockResolvedValue(response);
+
+      await expect(request()).rejects.toThrow(`SEP-12 ${method} /customer failed: ${statusText}`);
+      expect(json).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("propagates a transport rejection without retrying", async () => {
+      const error = new TypeError("Connection reset");
+      fetchMock.mockRejectedValue(error);
+
+      await expect(request()).rejects.toBe(error);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it("rejects malformed JSON in a successful response", async () => {
+      fetchMock.mockResolvedValue(new Response("not JSON", { status: 200 }));
+
+      await expect(request()).rejects.toBeInstanceOf(SyntaxError);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

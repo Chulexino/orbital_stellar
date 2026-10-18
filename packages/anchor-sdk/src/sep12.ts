@@ -79,6 +79,7 @@ export class Sep12Client {
       throw new Error(`SEP-12 PUT /customer failed: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return z.object({ id: z.string() }).parse(result);
   }
 }
