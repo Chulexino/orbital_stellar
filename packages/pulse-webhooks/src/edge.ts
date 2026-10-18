@@ -3,6 +3,14 @@ import type { NormalizedEvent } from "@orbital-stellar/pulse-core";
 import type { VerifyWebhookOptions } from "./types.js";
 import { DEFAULT_CLOCK_SKEW_MS, DEFAULT_MAX_AGE_MS } from "./types.js";
 
+function parseSignatureHex(signature: string): Uint8Array | null {
+  if (signature.length === 0 || signature.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(signature)) {
+    return null;
+  }
+
+  return new Uint8Array(signature.match(/.{2}/g)!.map((byte) => parseInt(byte, 16)));
+}
+
 /**
  * Verifies webhook signatures using Web Crypto API (compatible with Cloudflare Workers, Deno, and browsers)
  *
@@ -82,6 +90,9 @@ export async function verifyWebhookEdgeRaw(
   const maxAgeMs = options.maxAgeMs ?? DEFAULT_MAX_AGE_MS;
   if (timestampMs < nowMs - maxAgeMs - clockSkewMs) return false;
 
+  const signatureBytes = parseSignatureHex(signature);
+  if (!signatureBytes) return false;
+
   try {
     const keyData = new TextEncoder().encode(secret);
     const key = await crypto.subtle.importKey(
@@ -96,9 +107,6 @@ export async function verifyWebhookEdgeRaw(
       "HMAC",
       key,
       new TextEncoder().encode(signedPayload),
-    );
-    const signatureBytes = new Uint8Array(
-      signature.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
     );
     const expectedBytes = new Uint8Array(expectedBuffer);
     if (expectedBytes.length !== signatureBytes.length) return false;
@@ -119,7 +127,7 @@ export async function verifyWebhookEdgeRaw(
  *
  * **Trade-off:** The full body is still buffered internally (the Web Crypto API
  * does not support incremental HMAC). This is purely a consumer-facing convenience
- * that avoids forcing callers to buffer the stream themselves.
+ * that avoids forcing callers to buffer the body themselves.
  *
  * @param stream - The raw request body as a ReadableStream<Uint8Array>
  * @param signature - The x-orbital-signature header value
@@ -149,6 +157,9 @@ export async function verifyWebhookEdgeStream(
 
   const maxAgeMs = options.maxAgeMs ?? DEFAULT_MAX_AGE_MS;
   if (timestampMs < nowMs - maxAgeMs - clockSkewMs) return null;
+
+  const signatureBytes = parseSignatureHex(signature);
+  if (!signatureBytes) return null;
 
   // Enforce maximum body size by reading the stream into a single buffer.
   // The full body is still buffered internally (see doc trade-off below).
@@ -200,9 +211,6 @@ export async function verifyWebhookEdgeStream(
       new TextEncoder().encode(signedPayload),
     );
 
-    const signatureBytes = new Uint8Array(
-      signature.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || [],
-    );
     const expectedBytes = new Uint8Array(expectedBuffer);
     if (expectedBytes.length !== signatureBytes.length) return null;
 

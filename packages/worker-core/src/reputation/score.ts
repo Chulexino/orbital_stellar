@@ -47,6 +47,13 @@ export const SCORE_FORMULA_VERSION = "1.0.0";
 /** Default relative weights for the two scored dimensions. Need not sum to 1. */
 export const DEFAULT_WEIGHTS = { availability: 0.7, latency: 0.3 } as const;
 
+/**
+ * Parameters of the reputation formula: the window and recency half-life,
+ * the minimum samples below which no score is produced, the p95 latency
+ * target, and the dimension weights. Must carry the current
+ * {@link SCORE_FORMULA_VERSION}; `scoreOperator` refuses a mismatch so a
+ * stale stamp can never masquerade as current.
+ */
 export interface ScoreConfig {
   /**
    * Must equal {@link SCORE_FORMULA_VERSION}. Stamped onto every score so a
@@ -71,8 +78,14 @@ export interface ScoreConfig {
   weights?: { availability: number; latency: number };
 }
 
+/** Why a verdict detracted from a score: an availability miss, or a latency outlier. */
 export type ScoreContributorReason = "miss" | "slow";
 
+/**
+ * One verdict's negative contribution to a score, with the reason and the
+ * estimated impact on the `0..1000` scale - the unit of attribution that
+ * lets a score drop be traced to specific verdicts.
+ */
 export interface ScoreContributor {
   /** The verdict that detracted from the score. */
   verdict: Verdict;
@@ -87,6 +100,11 @@ export interface ScoreContributor {
   impact: number;
 }
 
+/**
+ * The result for an operator with fewer than `minSamples` verdicts in the
+ * window: deliberately not a neutral or penalty number, so absence of
+ * history can never be mistaken for performance.
+ */
 export interface InsufficientDataScore {
   status: "insufficient_data";
   operatorId: string;
@@ -98,6 +116,12 @@ export interface InsufficientDataScore {
   minSamples: number;
 }
 
+/**
+ * A computed reputation score: the `[0, 1000]` integer, the window and
+ * sample count it was computed over, the component metrics that produced it,
+ * and the contributors that dragged it down - everything needed to reproduce
+ * and defend the number.
+ */
 export interface ScoredScore {
   status: "scored";
   operatorId: string;
@@ -122,6 +146,11 @@ export interface ScoredScore {
   contributors: ScoreContributor[];
 }
 
+/**
+ * What scoring an operator yields: a {@link ScoredScore} when the window has
+ * enough verdicts, otherwise an {@link InsufficientDataScore} - never a
+ * default number. Discriminate on `status`.
+ */
 export type OperatorScore = InsufficientDataScore | ScoredScore;
 
 function clamp01(x: number): number {

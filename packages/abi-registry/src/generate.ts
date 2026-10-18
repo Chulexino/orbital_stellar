@@ -2,6 +2,17 @@ import { xdr } from "@stellar/stellar-sdk";
 import type { XdrContractSpec } from "./types.js";
 import type { ContractSpec, EventSpec, FunctionSpec, TypeSpec, UserDefinedType } from "./spec.js";
 
+/**
+ * Generated TypeScript artifacts for a contract spec.
+ *
+ * Each field is a standalone source string (or `undefined` when the
+ * corresponding artifact is not produced for the given spec):
+ * - `declarations`: type/interface declarations (and imports)
+ * - `schemas`: Zod schemas matching the declarations
+ * - `guards`: event type guards and the `ContractEventUnion` helper
+ * - `testDts`: a `.d.ts`-style exhaustiveness test scaffold
+ * - `hooks`: React hook wrappers, only when the spec declares events
+ */
 export type GeneratedContractArtifacts = {
   declarations: string;
   schemas: string;
@@ -608,6 +619,17 @@ function generateFromContractSpec(spec: ContractSpec): GeneratedContractArtifact
   };
 }
 
+/**
+ * Generates TypeScript declarations, Zod schemas, event guards and (when
+ * applicable) React hooks for the given contract spec.
+ *
+ * Accepts either a structured {@link ContractSpec} (registry / well-known
+ * bundle / WASM discovery) or a raw {@link XdrContractSpec} (base64 XDR
+ * entries, events only).
+ *
+ * @param spec - The contract spec to generate artifacts for.
+ * @returns The generated artifacts as source strings.
+ */
 export function generateContractArtifacts(
   spec: XdrContractSpec | ContractSpec,
 ): GeneratedContractArtifacts {
@@ -616,6 +638,13 @@ export function generateContractArtifacts(
     : generateFromContractSpec(spec);
 }
 
+/**
+ * Generates a single TypeScript source string containing the declarations,
+ * Zod schemas and event guards for the given contract spec.
+ *
+ * @param spec - The contract spec to generate types for.
+ * @returns The combined TypeScript source, with sections separated by blank lines.
+ */
 export function generateContractTypes(spec: XdrContractSpec | ContractSpec): string {
   const artifacts = generateContractArtifacts(spec);
   return [artifacts.declarations, artifacts.schemas, artifacts.guards].filter(Boolean).join("\n\n");
@@ -625,6 +654,9 @@ export function generateContractTypes(spec: XdrContractSpec | ContractSpec): str
  * Generates React hook wrappers (e.g. `useSwapExecuted()`) for every event
  * in the contract spec. Returns an empty string if the spec has no events
  * or is an XDR contract spec (which lacks structured event specs).
+ *
+ * @param spec - The contract spec to generate hooks for.
+ * @returns The generated hook source, or an empty string when no hooks apply.
  */
 export function generateContractHooks(spec: XdrContractSpec | ContractSpec): string {
   if (isXdrContractSpec(spec)) return "";

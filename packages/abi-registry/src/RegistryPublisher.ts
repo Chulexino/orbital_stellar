@@ -1,9 +1,15 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+/**
+ * Result of publishing a contract specification to a registry.
+ */
 export interface PublishResult {
+  /** The published contract ID */
   contractId: string;
+  /** Published spec version string */
   version: string;
+  /** Content hash or ETag representing the published spec */
   etag: string;
   /**
    * Transaction hash of the on-chain publish, if the publisher submits a
@@ -13,7 +19,16 @@ export interface PublishResult {
   txHash?: string;
 }
 
+/**
+ * Interface for publishing contract specifications to a registry target.
+ */
 export interface RegistryPublisher {
+  /**
+   * Publishes a contract specification.
+   *
+   * @param spec The specification object to publish
+   * @returns A promise resolving to the publish result
+   */
   publish(spec: unknown): Promise<PublishResult>;
 }
 
@@ -116,7 +131,17 @@ function loadSchema(): SchemaNode {
   return _schema;
 }
 
+/**
+ * Local filesystem publisher that validates contract specs against schema without network calls.
+ */
 export class LocalFilePublisher implements RegistryPublisher {
+  /**
+   * Validates a specification against the well-known JSON schema.
+   *
+   * @param spec The contract specification to validate and publish
+   * @returns Publish result with local version and timestamped ETag
+   * @throws {Error} If spec fails schema validation
+   */
   async publish(spec: unknown): Promise<PublishResult> {
     // Validate against spec.schema.json before writing.
     const schema = loadSchema();

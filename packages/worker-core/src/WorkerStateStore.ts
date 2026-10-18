@@ -36,6 +36,11 @@
 
 /** Current schema version. Increment when making a breaking field change. */
 export const WORKER_STATE_SCHEMA_VERSION = 1 as const;
+/**
+ * The worker-state schema version a store stamps onto persisted state -
+ * the type of {@link WORKER_STATE_SCHEMA_VERSION}, so a bump there is a
+ * compile-visible change everywhere the version is handled.
+ */
 export type WorkerStateSchemaVersion = typeof WORKER_STATE_SCHEMA_VERSION;
 
 // ---------------------------------------------------------------------------

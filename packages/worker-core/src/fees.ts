@@ -20,6 +20,11 @@ export const DEFAULT_MAX_FEE_STROOPS = 10_000_000;
 /** Classic base fee added on top of the resource fee, in stroops. */
 export const BASE_FEE_STROOPS = 100;
 
+/**
+ * Fee-resolution knobs for submitted transactions: the safety multiplier
+ * applied to the simulated resource fee and the hard ceiling on the total.
+ * Both optional; the defaults are the exported constants.
+ */
 export type FeeConfig = {
   /** Multiplier applied to the simulated resource fee. Defaults to {@link DEFAULT_FEE_MULTIPLIER}. */
   feeMultiplier?: number;
@@ -49,6 +54,11 @@ export class InvalidFeeConfigError extends Error {
   }
 }
 
+/**
+ * The fee actually placed on a transaction, with its derivation kept for
+ * logs and metrics: the simulated resource fee, the padded resource fee,
+ * and the resulting total in stroops.
+ */
 export type ResolvedFee = {
   /** Total fee to put on the transaction, in stroops. */
   totalStroops: number;

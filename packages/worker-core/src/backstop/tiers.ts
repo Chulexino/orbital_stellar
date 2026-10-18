@@ -175,6 +175,9 @@ export interface GuaranteeBounds {
   };
 }
 
+/**
+ * Specification and guarantee terms for a backstop latency tier.
+ */
 export interface TierDefinition {
   readonly id: TierId;
   readonly displayName: string;
@@ -213,6 +216,9 @@ function latencySensitiveIsRegistrable(): boolean {
   return LATENCY_SENSITIVE_TIER_DEFAULT.enabled;
 }
 
+/**
+ * Table of defined latency tiers keyed by their identifier.
+ */
 export const TIERS: Readonly<Record<TierId, TierDefinition>> = {
   "time-insensitive": {
     id: "time-insensitive",
@@ -261,6 +267,12 @@ export function registrableTiers(): TierId[] {
   return (Object.keys(TIERS) as TierId[]).filter((id) => TIERS[id].registrable);
 }
 
+/**
+ * Retrieves the {@link TierDefinition} for a given {@link TierId}.
+ *
+ * @param id - The tier identifier to look up.
+ * @returns The definition associated with the given tier ID.
+ */
 export function tierDefinition(id: TierId): TierDefinition {
   return TIERS[id];
 }

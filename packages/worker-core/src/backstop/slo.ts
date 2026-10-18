@@ -5,14 +5,19 @@ import type {
   VerdictStore,
 } from "@orbital-stellar/abi-registry";
 
+/**
+ * Dedicated operator ID representing the Orbital backstop service operator.
+ */
 export const ORBITAL_BACKSTOP_OPERATOR_ID = "orbital";
 
 const MAX_LEDGER = 1_000_000;
 const MAX_STROOPS = 9223372036854775807n;
 const WINDOW_STATUSES = new Set<WorkerWindowStatus>(["fired", "missed", "late", "not-due"]);
 
+/** Execution outcome status for a worker execution window. */
 export type WorkerWindowStatus = "fired" | "missed" | "late" | "not-due";
 
+/** Recorded execution verdict for a worker over an evaluation window. */
 export type WorkerWindowVerdict = {
   workerId: string;
   operatorId: string;
@@ -22,6 +27,7 @@ export type WorkerWindowVerdict = {
   ledgerEnd: number;
 };
 
+/** SLA bounds and operational constraints for the backstop operator. */
 export type BackstopSloBounds = {
   latencyBoundLedgers: number;
   gracePeriodLedgers: number;
@@ -29,23 +35,28 @@ export type BackstopSloBounds = {
   monitoringLagGraceLedgers: number;
 };
 
+/** High-level SLO compliance status of the backstop service. */
 export type SloStatus = "meeting" | "breached" | "unverifiable";
 
+/** Store responsible for persisting and querying worker execution window verdicts. */
 export type WorkerVerdictStore = {
   record(verdict: WorkerWindowVerdict): Promise<void>;
   getByOperator(operatorId: string): Promise<WorkerWindowVerdict[]>;
 };
 
+/** Operator reputation score details and status. */
 export type OperatorScore = {
   operatorId: string;
   formulaVersion: string;
   kind: "scored" | "insufficient-data";
 };
 
+/** Scorer that computes an operator's reputation score from historical window verdicts. */
 export type OperatorScorer = {
   score(store: WorkerVerdictStore, operatorId: string): Promise<OperatorScore>;
 };
 
+/** Parameters for evaluating backstop operator SLO compliance. */
 export type EvaluateBackstopSloInput = {
   windows: WorkerWindowVerdict[];
   bounds: BackstopSloBounds;
@@ -58,12 +69,14 @@ export type EvaluateBackstopSloInput = {
   sloVerdictStore: VerdictStore;
 };
 
+/** Result of an SLO evaluation, including compliance status, operator score, and recorded ABI verdict. */
 export type BackstopSloResult = {
   status: SloStatus;
   operatorScore: OperatorScore;
   abiRecord: VerdictRecord;
 };
 
+/** Error codes identifying specific failures when evaluating backstop SLOs. */
 export type BackstopSloErrorCode =
   | "MISSING_DEPENDENCY"
   | "INVALID_OPERATOR"
@@ -72,9 +85,17 @@ export type BackstopSloErrorCode =
   | "BOUNDS_OUT_OF_RANGE"
   | "UNKNOWN_VERDICT";
 
+/** Error thrown when backstop SLO evaluation fails due to invalid parameters or dependencies. */
 export class BackstopSloError extends Error {
+  /** The programmatic error code for this error. */
   readonly code: BackstopSloErrorCode;
 
+  /**
+   * Initializes a new instance of {@link BackstopSloError}.
+   *
+   * @param code - The specific error code.
+   * @param message - Descriptive error message.
+   */
   constructor(code: BackstopSloErrorCode, message: string) {
     super(message);
     this.name = "BackstopSloError";
@@ -124,6 +145,14 @@ function assertOperatorId(id: string): void {
   }
 }
 
+/**
+ * Evaluates the backstop operator's SLO compliance across recent windows, computes reputation score,
+ * records verdicts in the ABI store, and triggers alerts on status transitions.
+ *
+ * @param input - Evaluation parameters and dependencies including ledger state, bounds, windows, stores, and alert manager.
+ * @returns An object containing the SLO compliance status, the operator reputation score, and the persisted ABI verdict record.
+ * @throws {@link BackstopSloError} If required dependencies are missing, operator IDs are invalid, or numbers/bounds are out of range.
+ */
 export async function evaluateBackstopSlo(
   input: EvaluateBackstopSloInput,
 ): Promise<BackstopSloResult> {

@@ -5,21 +5,39 @@ import type { SpecStore, RegisteredSpec } from "./specStore.js";
 import type { IssueReporter } from "./issueReporter.js";
 import type { AlertManager } from "./alertManager.js";
 
+/**
+ * Configuration options for running a batch verification job over registered specs.
+ */
 export type VerificationJobConfig = {
+  /** Spec store providing the registered contract specifications to verify */
   specStore: SpecStore;
+  /** Verdict store where verification results and history are recorded */
   verdictStore: VerdictStore;
+  /** Options passed to the schema verification engine (e.g. RPC URL) */
   verifyOptions: VerifySchemaOptions;
+  /** Optional issue reporter to open tickets on schema mismatches */
   issueReporter?: IssueReporter;
+  /** Optional alert manager to notify on verdict status changes */
   alertManager?: AlertManager;
+  /** Optional callback invoked as each contract verification completes */
   onVerdict?: (record: VerdictRecord) => void;
 };
 
+/**
+ * Summary result of a verification job run across all registered contracts.
+ */
 export type JobResult = {
+  /** Total number of contract specs processed */
   total: number;
+  /** Count of specs that matched on-chain bytecode */
   verified: number;
+  /** Count of specs that had schema differences against on-chain bytecode */
   mismatch: number;
+  /** Count of contracts that could not be verified (e.g. no embedded spec) */
   unverifiable: number;
+  /** Errors encountered during verification processing */
   errors: { contractId: string; error: string }[];
+  /** URLs or identifiers of issues created for mismatches */
   issuesCreated: string[];
 };
 
@@ -34,6 +52,16 @@ function verdictToStatus(verdict: SchemaVerdict): VerdictRecord["status"] {
   }
 }
 
+/**
+ * Runs a verification job across all specifications in the spec store.
+ *
+ * Compares each registered spec against the deployed on-chain contract spec,
+ * records verdicts in the verdict store, reports mismatches via the issue reporter,
+ * and notifies the alert manager when statuses transition.
+ *
+ * @param config Configuration specifying stores, options, and reporters
+ * @returns Summary of verification counts, created issues, and encountered errors
+ */
 export async function runVerificationJob(config: VerificationJobConfig): Promise<JobResult> {
   const result: JobResult = {
     total: 0,

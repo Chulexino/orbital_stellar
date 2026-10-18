@@ -1,0 +1,169 @@
+{
+  "contractId": "CDAFTSXPZFIVOXVP3FMZ6ARUHQZM3CICFSCQZPHFCZCXKPNWCX4HRDC2",
+  "description": "Orbit Treasury: Orbit CDP stablecoin minting, burning, and flash-loan contract on Stellar mainnet.",
+  "events": [],
+  "functions": [
+    {
+      "name": "claim",
+      "params": [
+        {
+          "name": "reserve_address",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "set_admin",
+      "params": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "doc": "Initialize the treasury\n\n### Arguments\n* `admin` - The Address of the admin\n* `factory` - The Address for the blend factory\n\n### Panics\nIf the contract is already initialized",
+      "name": "__constructor",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "factory",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "add_stablecoin",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "blend_pool",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "decrease_supply",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "increase_supply",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "Orbit CDP Treasury",
+  "network": "mainnet",
+  "types": {
+    "TreasuryDataKey": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "ADMIN"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "BLENDPOOL"
+        },
+        {
+          "fields": [],
+          "name": "FACTORY"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "TOTALSUPPLY"
+        }
+      ],
+      "kind": "union",
+      "name": "TreasuryDataKey"
+    },
+    "TreasuryError": {
+      "kind": "enum",
+      "name": "TreasuryError",
+      "variants": [
+        {
+          "discriminant": 1501,
+          "name": "AlreadyInitializedError"
+        },
+        {
+          "discriminant": 1502,
+          "name": "InvalidAmount"
+        },
+        {
+          "discriminant": 1504,
+          "name": "NotEnoughSupplyError"
+        },
+        {
+          "discriminant": 1506,
+          "name": "BlendPoolNotFoundError"
+        },
+        {
+          "discriminant": 1507,
+          "name": "AlreadyAddedError"
+        },
+        {
+          "discriminant": 1508,
+          "name": "InvalidBlendPoolError"
+        },
+        {
+          "discriminant": 1509,
+          "name": "NoInterestToClaim"
+        }
+      ]
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAADVRyZWFzdXJ5RXJyb3IAAAAAAAAHAAAAAAAAABdBbHJlYWR5SW5pdGlhbGl6ZWRFcnJvcgAAAAXdAAAAAAAAAA1JbnZhbGlkQW1vdW50AAAAAAAF3gAAAAAAAAAUTm90RW5vdWdoU3VwcGx5RXJyb3IAAAXgAAAAAAAAABZCbGVuZFBvb2xOb3RGb3VuZEVycm9yAAAAAAXiAAAAAAAAABFBbHJlYWR5QWRkZWRFcnJvcgAAAAAABeMAAAAAAAAAFUludmFsaWRCbGVuZFBvb2xFcnJvcgAAAAAABeQAAAAAAAAAEU5vSW50ZXJlc3RUb0NsYWltAAAAAAAF5Q==",
+    "AAAAAgAAAAAAAAAAAAAAD1RyZWFzdXJ5RGF0YUtleQAAAAAEAAAAAAAAAAAAAAAFQURNSU4AAAAAAAABAAAAAAAAAAlCTEVORFBPT0wAAAAAAAABAAAAEwAAAAAAAAAAAAAAB0ZBQ1RPUlkAAAAAAQAAAAAAAAALVE9UQUxTVVBQTFkAAAAAAQAAABM=",
+    "AAAAAAAAAAAAAAAFY2xhaW0AAAAAAAACAAAAAAAAAA9yZXNlcnZlX2FkZHJlc3MAAAAAEwAAAAAAAAACdG8AAAAAABMAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAK5Jbml0aWFsaXplIHRoZSB0cmVhc3VyeQoKIyMjIEFyZ3VtZW50cwoqIGBhZG1pbmAgLSBUaGUgQWRkcmVzcyBvZiB0aGUgYWRtaW4KKiBgZmFjdG9yeWAgLSBUaGUgQWRkcmVzcyBmb3IgdGhlIGJsZW5kIGZhY3RvcnkKCiMjIyBQYW5pY3MKSWYgdGhlIGNvbnRyYWN0IGlzIGFscmVhZHkgaW5pdGlhbGl6ZWQAAAAAAA1fX2NvbnN0cnVjdG9yAAAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAOYWRkX3N0YWJsZWNvaW4AAAAAAAIAAAAAAAAABXRva2VuAAAAAAAAEwAAAAAAAAAKYmxlbmRfcG9vbAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAPZGVjcmVhc2Vfc3VwcGx5AAAAAAIAAAAAAAAABXRva2VuAAAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA==",
+    "AAAAAAAAAAAAAAAPaW5jcmVhc2Vfc3VwcGx5AAAAAAIAAAAAAAAABXRva2VuAAAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA=="
+  ]
+}

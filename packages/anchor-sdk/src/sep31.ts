@@ -2,6 +2,11 @@ import { z } from "zod";
 import type { Sep31Status } from "@orbital-stellar/pulse-core";
 import { Sep12Client } from "./sep12.js";
 
+/**
+ * Zod schema for the SEP-31 `/info` response: the assets the anchor can
+ * receive, their fee/limit metadata and the SEP-12 customer types and
+ * transaction fields each asset requires.
+ */
 export const Sep31InfoSchema = z.object({
   receive: z.record(
     z.string(),
@@ -31,8 +36,10 @@ export const Sep31InfoSchema = z.object({
   ),
 });
 
+/** Parsed Sep31InfoSchema response - the anchor's receivable assets and their requirements. */
 export type Sep31Info = z.infer<typeof Sep31InfoSchema>;
 
+/** Thrown when a SEP-31 transaction is missing fields the anchor requires. */
 export class MissingFieldsError extends Error {
   constructor(public missingFields: string[]) {
     super(`Missing required fields: ${missingFields.join(", ")}`);
@@ -40,6 +47,7 @@ export class MissingFieldsError extends Error {
   }
 }
 
+/** Thrown when the anchor needs SEP-12 customer information for the sender or receiver. */
 export class CustomerInfoNeededError extends Error {
   constructor(
     public customerType: "sender" | "receiver",
@@ -50,13 +58,34 @@ export class CustomerInfoNeededError extends Error {
   }
 }
 
+/**
+ * Client for the SEP-31 cross-border payments protocol.
+ *
+ * Exposes the anchor's `/info`, `/transactions` and `/transactions/:id`
+ * endpoints and owns a {@link Sep12Client} for the SEP-12 customer handoff.
+ * Methods that talk to the anchor throw {@link MissingFieldsError} or {@link CustomerInfoNeededError}
+ * when the anchor reports that more information is required, and a generic `Error`
+ * for any other failure.
+ */
 export class Sep31Client {
+  /** SEP-12 client sharing this anchor's base URL, for customer registration. */
   public sep12: Sep12Client;
 
+  /**
+   * Create a SEP-31 client against an anchor's direct payment server.
+   *
+   * @param anchorUrl - Base URL of the anchor's SEP-31 direct payment server.
+   */
   constructor(private anchorUrl: string) {
     this.sep12 = new Sep12Client(anchorUrl);
   }
 
+  /**
+   * GET /info - the assets the anchor can receive and their requirements.
+   *
+   * @throws {Error} When the response is not ok or does not match
+   * {@link Sep31InfoSchema}.
+   */
   async info(): Promise<Sep31Info> {
     const url = new URL(`${this.anchorUrl}/info`);
     const response = await fetch(url.toString());
@@ -67,6 +96,17 @@ export class Sep31Client {
     return Sep31InfoSchema.parse(data);
   }
 
+  /**
+   * POST /transactions - start a SEP-31 payment and return the stellar
+   * account/memo the sender must pay.
+   *
+   * @param params - Asset, amount and optional SEP-12 customer ids and extra fields.
+   * @param token - SEP-10 session JWT.
+   * @returns The transaction id and the Stellar account and memo to pay.
+   * @throws {Link MissingFieldsError} When the anchor reports transaction fields are missing.
+   * @throws {Link CustomerInfoNeededError} When the anchor needs SEP-12 customer info.
+   * @throws {Error} For any other non-ok response.
+   */
   async initiateTransaction(
     params: {
       asset_code: string;
@@ -108,6 +148,14 @@ export class Sep31Client {
     return data;
   }
 
+  /**
+   * GET /transactions/:id - the current status of a SEP-31 transaction.
+   *
+   * @param transactionId - The id returned by {@link initiateTransaction}.
+   * @param token - SEP-10 session JWT.
+   * @returns The transaction's status and amounts.
+   * @throws {Error} When the response is not ok.
+   */
   async pollStatus(
     transactionId: string,
     token: string,

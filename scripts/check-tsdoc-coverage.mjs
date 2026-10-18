@@ -26,6 +26,26 @@ const packages = [
     tsconfig: "packages/pulse-notify/tsconfig.json",
     entryPoints: ["packages/pulse-notify/src/index.ts", "packages/pulse-notify/src/devtools.tsx"],
   },
+  {
+    name: "abi-registry",
+    tsconfig: "packages/abi-registry/tsconfig.json",
+    entryPoints: ["packages/abi-registry/src/index.ts"],
+  },
+  {
+    name: "anchor-sdk",
+    tsconfig: "packages/anchor-sdk/tsconfig.json",
+    entryPoints: ["packages/anchor-sdk/src/index.ts"],
+  },
+  {
+    name: "orbital-indexer",
+    tsconfig: "packages/orbital-indexer/tsconfig.json",
+    entryPoints: ["packages/orbital-indexer/src/index.ts"],
+  },
+  {
+    name: "worker-core",
+    tsconfig: "packages/worker-core/tsconfig.json",
+    entryPoints: ["packages/worker-core/src/index.ts"],
+  },
 ];
 
 function findMissingDocs(tsconfigPath, entryFiles) {

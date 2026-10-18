@@ -30,6 +30,10 @@ import type { Intervention, InterventionNotifier, InterventionRecorder } from ".
  */
 export type LatencyTier = "time-insensitive" | "latency-sensitive";
 
+/**
+ * Error message returned when attempting to register a subscription under the
+ * latency-sensitive tier before it is enabled in W3.
+ */
 export const LATENCY_SENSITIVE_REJECTION =
   "W3 backstops cover time-insensitive tiers only — payroll, periodic settlement, " +
   "where a fallback firing an hour late is a non-event. A latency-sensitive tier " +
@@ -73,6 +77,12 @@ export interface FallbackSubmitter {
   submit(decision: FireDecision): Promise<void> | void;
 }
 
+/**
+ * Result of registering a subscription with {@link registerBackstop}.
+ *
+ * Returns either the validated `WatchedSubscription` on success, or a list of
+ * validation error messages on failure.
+ */
 export type RegisterBackstopResult =
   | { readonly ok: true; readonly subscription: WatchedSubscription }
   | { readonly ok: false; readonly errors: ReadonlyArray<string> };
@@ -121,6 +131,9 @@ export type BackstopOutcome =
   /** The backstop won the claim but submission failed. */
   | { readonly kind: "submission-failed"; readonly windowId: string; readonly error: Error };
 
+/**
+ * Cumulative operational counters tracked across windows evaluated by {@link BackstopWatcher}.
+ */
 export type BackstopStats = {
   /** Windows examined. This is the readiness cost — it scales with subscriptions, not failures. */
   readonly windowsWatched: number;
@@ -136,6 +149,9 @@ export type BackstopStats = {
   readonly submissionFailures: number;
 };
 
+/**
+ * Runtime dependencies required by {@link BackstopWatcher} to watch windows and intervene on misses.
+ */
 export type BackstopDeps = {
   readonly verdicts: WindowVerdictSource;
   /** The same store the primary claims through. Sharing it is what prevents the double fire. */

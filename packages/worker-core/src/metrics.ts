@@ -21,6 +21,11 @@ import type { CostMeter } from "./backstop/costMeter.js";
 
 export type MetricAttributes = Record<string, string | number | boolean>;
 
+/**
+ * The minimal counter surface the cost meter emits to - add-only, matching
+ * the OpenTelemetry counter shape, so a real OTel meter drops in and tests
+ * supply a recording stub.
+ */
 export type OtelCounter = {
   add(value: number, attributes?: MetricAttributes): void;
 };

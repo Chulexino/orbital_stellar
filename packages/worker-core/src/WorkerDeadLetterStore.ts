@@ -32,12 +32,21 @@ export type WorkerDeadLetterInput = {
   metadata?: Record<string, unknown>;
 };
 
+/**
+ * A stored dead letter: the failed submission as it was recorded, plus the
+ * store-assigned id, arrival timestamp and - once replayed - when.
+ */
 export type WorkerDeadLetterEntry = WorkerDeadLetterInput & {
   id: string;
   timestamp: number;
   replayedAt?: number | null;
 };
 
+/**
+ * Query shape for listing dead letters: by submission, outcome, terminal
+ * failure kind, miss-only, and a since/until time range. Every field is
+ * optional; omitted fields match everything.
+ */
 export type WorkerDeadLetterFilter = {
   submissionId?: string;
   outcome?: WorkerDeadLetterInput["outcome"];
@@ -65,6 +74,7 @@ export interface WorkerDeadLetterStore {
   delete(id: string): Promise<boolean>;
 }
 
+/** Capacity bound and optional replay handler for the in-memory dead-letter store. */
 export type MemoryWorkerDeadLetterStoreOptions = {
   maxEntries?: number;
   replay?: WorkerReplayHandler;

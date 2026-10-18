@@ -85,6 +85,11 @@ export { RateLimitedError, FeeTooHighError, FloatExhaustedError } from "./sponso
 // Configuration
 // ---------------------------------------------------------------------------
 
+/**
+ * Construction parameters for a {@link Paymaster}: the operator keypair that
+ * pays and signs fee bumps (never a user keypair), the network passphrase,
+ * and the sponsorship policy that bounds who gets bumped and how often.
+ */
 export interface PaymasterConfig {
   /**
    * The operator's keypair.  The public key becomes the fee-bump `feeSource`;
@@ -112,6 +117,10 @@ export interface PaymasterConfig {
 // Input / output types
 // ---------------------------------------------------------------------------
 
+/**
+ * A fee-bump request: the user's signed inner envelope (base64 XDR, at least
+ * one signature and one operation) plus the user account the policy meters.
+ */
 export interface BumpInput {
   /**
    * Base64-encoded XDR of the user's signed transaction envelope.
@@ -128,6 +137,10 @@ export interface BumpInput {
   baseFee: bigint;
 }
 
+/**
+ * A granted fee bump: the signed fee-bump envelope ready for submission and
+ * the total fee the operator pays for it, in stroops.
+ */
 export interface BumpResult {
   /**
    * Base64-encoded XDR of the signed fee-bump envelope, ready to submit to
@@ -152,6 +165,13 @@ export interface BumpResult {
 // Paymaster
 // ---------------------------------------------------------------------------
 
+/**
+ * Wraps user transactions in operator-paid fee bumps. Validates the inner
+ * envelope, meters the request against the configured sponsorship policy
+ * (throwing a policy error when a bound is hit), and signs the outer
+ * envelope with the operator keypair - the operator pays the fee, the
+ * user's own signature and operations are untouched.
+ */
 export class Paymaster {
   readonly #keypair: Keypair;
   readonly #network: string;

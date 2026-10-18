@@ -41,6 +41,7 @@ export type ExportOperation =
       authorized: boolean;
     };
 
+/** One transaction as delivered by a ledger export: its id and operations. */
 export type ExportTransaction = {
   transactionId: string;
   operations: ExportOperation[];

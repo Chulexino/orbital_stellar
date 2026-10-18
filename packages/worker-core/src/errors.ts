@@ -193,7 +193,7 @@ function hasNetworkCause(error: unknown): boolean {
   const cause = error.cause;
   if (cause instanceof Error) {
     const name = cause.name.toLowerCase();
-    if (name.includes("timeout") || name.includes("network") || name.includes("ECONN")) {
+    if (name.includes("timeout") || name.includes("network") || name.includes("econn")) {
       return true;
     }
   }

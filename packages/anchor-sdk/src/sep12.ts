@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+/**
+ * Shape of a SEP-12 `GET /customer` response: the customer's KYC status plus
+ * the fields the anchor still expects (or has rejected).
+ */
 export const Sep12CustomerInfoSchema = z.object({
   id: z.string().optional(),
   status: z.enum(["ACCEPTED", "PROCESSING", "NEEDS_INFO", "REJECTED"]),
@@ -26,8 +30,17 @@ export const Sep12CustomerInfoSchema = z.object({
   message: z.string().optional(),
 });
 
+/** Parsed SEP-12 customer record - the fields {@link Sep12CustomerInfoSchema} extracts. */
 export type Sep12CustomerInfo = z.infer<typeof Sep12CustomerInfoSchema>;
 
+/**
+ * Minimal SEP-12 client for the anchor's `KYC_SERVER`.
+ *
+ * @remarks
+ * `getCustomer` reads a customer's status; `putCustomer` uploads KYC fields.
+ * Both throw an `Error` on a non-2xx response, and `getCustomer` additionally
+ * throws if the response body does not match {@link Sep12CustomerInfoSchema}.
+ */
 export class Sep12Client {
   constructor(private anchorUrl: string) {}
 
@@ -66,6 +79,7 @@ export class Sep12Client {
       throw new Error(`SEP-12 PUT /customer failed: ${response.statusText}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    return z.object({ id: z.string() }).parse(result);
   }
 }

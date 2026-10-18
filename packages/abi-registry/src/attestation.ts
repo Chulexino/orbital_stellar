@@ -10,8 +10,8 @@
  * the same signing/verification/canonicalization is reusable for a
  * differently-shaped document - `worker-core`'s off-chain-computation
  * trigger attestations (issue #1061) do exactly this, per that issue's own
- * instruction to reuse this module's signature model rather than invent a
- * second one. `T`'s default of `AttestationDocument` keeps every existing
+ * instruction to reuse this module's signature model rather than invent
+ * a second one. `T`'s default of `AttestationDocument` keeps every existing
  * call site source-compatible without specifying a type argument.
  */
 import { Keypair, StrKey } from "@stellar/stellar-sdk";
@@ -73,7 +73,7 @@ export class AttestationSigningError extends Error {
  *   account, so a mismatch here would produce an envelope that always fails
  *   {@link verifyAttestation}'s attester-match check.
  * @param attesterSecret The attester's Stellar secret key (`S...`).
- * @throws {AttestationSigningError} if `attesterSecret` isn't a valid Stellar
+ * @throws {@link AttestationSigningError} if `attesterSecret` isn't a valid Stellar
  *   secret key, or if it doesn't correspond to `document.attester`.
  */
 export function signAttestation<T extends { attester: string }>(
@@ -106,6 +106,9 @@ export function signAttestation<T extends { attester: string }>(
 /** A verification outcome for {@link verifyAttestation}: either valid, or invalid with a reason. */
 export type AttestationVerdict = { status: "valid" } | { status: "invalid"; reason: string };
 
+/**
+ * Options for {@link verifyAttestation}.
+ */
 export type VerifyAttestationOptions = {
   /**
    * The attested contract's actual on-chain WASM hash (hex-encoded), fetched
@@ -126,7 +129,7 @@ export type VerifyAttestationOptions = {
  *    this also catches any tampering with the payload after signing, since
  *    a single changed byte produces different canonical JSON.
  * 4. If `options.expectedWasmHash` is given: `envelope.payload.executableKind`
- *    must be `"wasm"` (a SAC has no WASM hash to check against), and it must
+ *    must be `"wasm`` (a SAC has no WASM hash to check against), and it must
  *    match `envelope.payload.wasmHash`.
  *
  * Rules are checked in the above order and verification short-circuits on

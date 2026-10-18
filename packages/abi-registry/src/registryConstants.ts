@@ -21,6 +21,7 @@ export const ORBITAL_REGISTRY_TESTNET_CONTRACT_ID =
 export const ORBITAL_REGISTRY_PUBLISHER_ADDRESS =
   "GBBHYIMKT43UAFUG2F4QHSJK25Q2AZSA3RRB6JSHUABDAXMQARGJZYHG";
 
+/** Default Soroban RPC endpoint URL for Stellar testnet. */
 export const ORBITAL_REGISTRY_TESTNET_RPC_URL = "https://soroban-testnet.stellar.org";
 
 /**

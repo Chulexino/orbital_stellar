@@ -14,6 +14,9 @@ import { TtlLruCache, DEFAULT_MAX_CACHE_SIZE, DEFAULT_CACHE_TTL_MS } from "./Ttl
 import { validateSpec, canonicalizeSpec } from "./spec.js";
 import type { ContractSpec } from "./spec.js";
 
+/**
+ * Configuration options for {@link OnChainAbiRegistryClient}.
+ */
 export type OnChainAbiRegistryClientConfig = {
   /** The deployed registry contract's ID (see contracts/registry). */
   contractId: string;
@@ -117,12 +120,21 @@ export class RegistryEntryArchivedError extends Error {
  */
 const ARCHIVED_ENTRY_ERROR = /archiv|expired|EntryArchived|restore/i;
 
+/**
+ * Metadata record for a published contract spec as stored on-chain in the registry.
+ */
 export type SpecRecord = {
+  /** Semver version of the published spec */
   version: string;
+  /** Hex-encoded SHA-256 hash of the spec content */
   specHash: string; // hex
+  /** Off-chain URI pointer where the spec blob is hosted */
   pointer: string;
+  /** Address of the publisher account that registered the spec */
   publisher: string;
+  /** ISO timestamp when the spec was published */
   publishedAt: string;
+  /** Ledger sequence number in which the publish transaction was included */
   publishedAtLedger: number;
 };
 

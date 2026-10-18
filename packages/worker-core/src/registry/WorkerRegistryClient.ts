@@ -26,6 +26,10 @@ const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
+/**
+ * Configuration for {@link WorkerRegistryClient}: the registry's base URL
+ * plus optional LRU-cache bounds (entry count and TTL) for resolved records.
+ */
 export type WorkerRegistryClientConfig = {
   /** Base URL of the hosted worker registry. */
   baseUrl: string;

@@ -19,6 +19,12 @@ export class Sep1DiscoveryError extends Error {
   }
 }
 
+/**
+ * Shape of the subset of fields this SDK reads from an anchor's
+ * `stellar.toml`. Every field is optional: a real `stellar.toml` declares only
+ * the endpoints the anchor supports, so a missing endpoint means "unsupported"
+ * rather than "invalid".
+ */
 export const StellarTomlSchema = z.object({
   /** SEP-10 authentication endpoint. */
   WEB_AUTH_ENDPOINT: z.string().optional(),
@@ -34,8 +40,13 @@ export const StellarTomlSchema = z.object({
   NETWORK_PASSPHRASE: z.string().optional(),
 });
 
+/** Parsed `stellar.toml` - the fields {@link StellarTomlSchema} extracts. */
 export type StellarToml = z.infer<typeof StellarTomlSchema>;
 
+/**
+ * Options for {@link discoverAnchor}: an optional `fetch` transport override, a
+ * request timeout, and a cap on how large a `stellar.toml` will be read.
+ */
 export type Sep1Options = {
   /** Transport override; defaults to the global `fetch`. */
   transport?: (input: string, init?: RequestInit) => Promise<Response>;

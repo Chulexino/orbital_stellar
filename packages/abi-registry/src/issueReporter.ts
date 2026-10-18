@@ -1,21 +1,52 @@
+/**
+ * Reports schema mismatches to an issue tracker or ticketing system.
+ */
 export interface IssueReporter {
+  /**
+   * Reports a schema mismatch.
+   *
+   * @param params Details of the mismatch and affected contract
+   * @returns The created issue URL or identifier
+   */
   reportMismatch(params: MismatchReportParams): Promise<string>;
 }
 
+/**
+ * Parameters for reporting a schema mismatch between a submitted schema and on-chain spec.
+ */
 export type MismatchReportParams = {
+  /** The contract ID where the mismatch occurred */
   contractId: string;
+  /** Name of the contract */
   contractName: string;
+  /** Differences detected between the submitted schema and on-chain spec */
   diffs: { path: string; submitted: unknown; onChain: unknown }[];
+  /** Version string of the submitted schema, if known */
   submittedVersion?: string;
+  /** Previous verification status before this mismatch was detected */
   previousStatus?: string;
 };
 
+/**
+ * Reports schema mismatches as GitHub issues in a specified repository.
+ */
 export class GitHubIssueReporter implements IssueReporter {
+  /**
+   * @param token GitHub API token with issue creation permissions
+   * @param repo Target repository in "owner/repo" format
+   */
   constructor(
     private readonly token: string,
     private readonly repo: string,
   ) {}
 
+  /**
+   * Creates a GitHub issue detailing the schema mismatch.
+   *
+   * @param params Details of the mismatch
+   * @returns A promise resolving to the URL of the created issue
+   * @throws {Error} If the GitHub API request fails
+   */
   async reportMismatch(params: MismatchReportParams): Promise<string> {
     const title = `[ABI Registry] Schema mismatch detected for ${params.contractName} (${params.contractId.slice(0, 8)}…)`;
     const body = [
@@ -69,7 +100,16 @@ export class GitHubIssueReporter implements IssueReporter {
   }
 }
 
+/**
+ * Issue reporter that discards mismatch reports without creating issues.
+ */
 export class NoopIssueReporter implements IssueReporter {
+  /**
+   * Discards the mismatch report.
+   *
+   * @param _params Details of the mismatch (ignored)
+   * @returns An empty string
+   */
   async reportMismatch(_params: MismatchReportParams): Promise<string> {
     return "";
   }

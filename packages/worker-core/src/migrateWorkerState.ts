@@ -1,5 +1,6 @@
 import { WorkerStateStore } from "./WorkerStateStore.js";
 
+/** What a state migration did: how many workers' state was copied. */
 export interface MigrateWorkerStateResult {
   migrated: number;
 }

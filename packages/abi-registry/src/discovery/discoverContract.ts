@@ -5,9 +5,15 @@ import type { ContractSpec } from "../spec.js";
 export { NoEmbeddedSpecError } from "./parseContractSpec.js";
 export type { ParsedWasmSpec } from "./parseContractSpec.js";
 
+/**
+ * Options for {@link discoverContractSpec}.
+ */
 export type DiscoverContractSpecOptions = {
+  /** RPC URL of the network the contract is deployed on. */
   rpcUrl: string;
+  /** Contract ID (C...) to fetch and parse. */
   contractId: string;
+  /** Network to record on the resulting spec. */
   network?: "mainnet" | "testnet" | "futurenet";
 };
 
@@ -26,10 +32,16 @@ export type DiscoverContractSpecOptions = {
  * indexer) should fall back to a manually published registry override in
  * that case, per maintainer.md.
  *
- * `version` and `name` aren't intrinsic to WASM bytecode - they're
+ * @version and @name aren't intrinsic to WASM bytecode - they're
  * publishing concepts, not code concepts - so this fills in placeholders
  * (`version: "0.0.0"`, `name: contractId`) that satisfy `validateSpec`.
  * Callers that go on to publish the result should set a real version first.
+ *
+ * @param opts The RPC URL, contract ID, and optional network to discover.
+ * @returns The discovered {@link ContractSpec}, with placeholder `version`
+ *   and `name`.
+ * @throws {@link NoEmbeddedSpecError} When the WASM can't be fetched or has no
+ *   embedded `contractspecv0` section.
  */
 export async function discoverContractSpec(
   opts: DiscoverContractSpecOptions,

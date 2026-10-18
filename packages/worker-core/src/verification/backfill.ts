@@ -11,6 +11,11 @@ export function windowStartFor(ledger: number, windowSize: number): number {
   return Math.floor(ledger / windowSize) * windowSize;
 }
 
+/**
+ * Inputs for {@link BackfillRunner}: the export reader and range to read, the
+ * sink and checkpoint store to write, and optional window sizing, subject
+ * filtering and progress callback.
+ */
 export type BackfillOptions = {
   reader: ExportReader;
   range: LedgerRange;
@@ -24,6 +29,7 @@ export type BackfillOptions = {
   onVerdict?: (verdict: Verdict) => void;
 };
 
+/** Summary of a completed {@link BackfillRunner.run} call: how much was read, emitted and written. */
 export type BackfillResult = {
   ledgersRead: number;
   windowsEmitted: number;
