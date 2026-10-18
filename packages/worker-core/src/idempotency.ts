@@ -1,19 +1,38 @@
 import type { PgLike } from "./PostgresWorkerStateStore.js";
 
+/**
+ * Identity of one fire attempt: the worker and the window it fires for.
+ * Two processes computing the same key are trying to do the same work -
+ * which is exactly what the claim store exists to serialize.
+ */
 export type FireKey = {
   workerId: string;
   windowStartLedger: number;
 };
 
+/**
+ * Canonical string form of a {@link FireKey} (`workerId:windowStartLedger`),
+ * used as the claim-store key.
+ *
+ * @param k - The fire key to serialize.
+ * @returns The canonical `workerId:windowStartLedger` string.
+ */
 export function fireKeyToString(k: FireKey): string {
   return `${k.workerId}:${k.windowStartLedger}`;
 }
 
+/** A held claim: who owns it and when it expires (epoch ms). */
 export interface ClaimRecord {
   owner: string;
   expiresAt: number; // epoch ms
 }
 
+/**
+ * Mutual exclusion for fire attempts. `claim` atomically takes the key for
+ * `owner` with a TTL and reports whether it won; `get` inspects the current
+ * holder; `release` frees it (optionally only when still held by `owner`).
+ * The TTL bounds how long a crashed owner can block the key.
+ */
 export interface ClaimStore {
   claim(key: string, owner: string, ttlMs: number): Promise<boolean>;
   get(key: string): Promise<ClaimRecord | null>;

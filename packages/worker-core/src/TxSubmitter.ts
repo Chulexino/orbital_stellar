@@ -31,6 +31,11 @@ export type SubmissionOutcome =
   | { status: "contract_rejected"; reason: string; simulation: SorobanSimulateTransactionResult }
   | { status: "failed"; reason: string; hash?: string; retryable: boolean };
 
+/**
+ * Everything a submitter needs: the RPC client, the single operator signer
+ * it may sign with, the network passphrase, confirmation timeout and poll
+ * tuning, and the {@link FeeConfig} fee knobs it inherits.
+ */
 export type TxSubmitterOptions = FeeConfig & {
   client: SorobanRpcClient;
   /** The single key this submitter may sign with. */

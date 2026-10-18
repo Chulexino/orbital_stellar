@@ -88,6 +88,11 @@ export class FloatExhaustedError extends Error {
 // Policy configuration
 // ---------------------------------------------------------------------------
 
+/**
+ * Bounds on fee-bump sponsorship: per-user rate limit within a sliding
+ * window, per-bump fee ceiling, and the operator's spend budget. All
+ * optional - each defaults to the documented value on its field.
+ */
 export interface SponsorshipPolicyConfig {
   /**
    * Maximum number of fee bumps a single user account may receive within

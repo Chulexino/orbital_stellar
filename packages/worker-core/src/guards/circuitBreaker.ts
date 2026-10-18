@@ -23,10 +23,16 @@ export interface ReenableRecord {
   rationale: string;
 }
 
+/**
+ * The breaker's current position: `closed` (passing, counting consecutive
+ * guard trips) or `open` (held open since `trippedAtUnix`, retaining the
+ * trips that opened it for diagnosis). Discriminate on `status`.
+ */
 export type CircuitBreakerState =
   | { status: "closed"; consecutiveTrips: number }
   | { status: "open"; trippedAtUnix: number; trippingTrips: readonly GuardTripRecord[] };
 
+/** Tuning for the guard circuit breaker - when consecutive trips hold it open. */
 export interface CircuitBreakerConfig {
   /** Trip and hold open after this many *consecutive* guard failures. */
   maxConsecutiveTrips: number;

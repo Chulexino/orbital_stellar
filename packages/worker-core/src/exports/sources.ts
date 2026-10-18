@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { ExportLedger, ExportSource, ExportSourceKind, LedgerRange } from "./types.js";
 import { parseCdpLedger, parseGalexieLedger } from "./parsers.js";
 
+/** The ledger-export dialects the export reader understands. */
 export type ExportFormat = "galexie" | "cdp";
 
 /**

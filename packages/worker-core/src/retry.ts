@@ -21,6 +21,10 @@ export type SubmissionHandle = {
   metadata?: Record<string, unknown>;
 };
 
+/**
+ * Shape of a retry policy: total attempt budget, exponential backoff bounds,
+ * and jitter. Attempts count the original try.
+ */
 export type RetryPolicyConfig = {
   /**
    * Maximum number of total attempts, counting the original. `maxAttempts: 3`
@@ -154,6 +158,7 @@ export interface WorkerRetryQueue {
   size(): Promise<number>;
 }
 
+/** Injectable clock and visibility timeout for the in-memory retry queue. */
 export type MemoryWorkerRetryQueueOptions = {
   now?: () => number;
   visibilityTimeoutMs?: number;
@@ -225,6 +230,7 @@ export class MemoryWorkerRetryQueue implements WorkerRetryQueue {
   }
 }
 
+/** Where the file-backed retry queue keeps its state file, plus an injectable clock. */
 export type FileWorkerRetryQueueOptions = {
   /** Directory holding the queue state file. Defaults to a temp file. */
   dir?: string;

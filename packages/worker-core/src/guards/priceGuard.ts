@@ -29,16 +29,19 @@ export interface PriceReading {
   source: string;
 }
 
+/** Freshness requirement on a price reading - how old is too old. */
 export interface StalenessBound {
   /** A reading older than this, or timestamped in the future, is rejected. */
   maxAgeSeconds: number;
 }
 
+/** Agreement requirement between two price sources - how far apart is too far. */
 export interface DeviationBound {
   /** Maximum allowed divergence between two sources, in basis points. */
   maxDivergenceBps: number;
 }
 
+/** The price guard's two bounds together: staleness and cross-source deviation. */
 export interface PriceGuardConfig {
   staleness: StalenessBound;
   deviation: DeviationBound;
@@ -64,6 +67,11 @@ interface DivergingVerdict {
   readings: [PriceReading, PriceReading];
 }
 
+/**
+ * What the price guard decided: `ok: true`, or a refusal naming the bound
+ * that failed (stale reading, or sources diverging beyond the allowed basis
+ * points) with the offending values. Discriminate on `ok` then `reason`.
+ */
 export type PriceGuardVerdict = GuardOk | StaleVerdict | DivergingVerdict;
 
 /**
