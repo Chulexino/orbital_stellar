@@ -393,6 +393,9 @@ export type AbiRegistryClientTransport = (
   init?: RequestInit,
 ) => Promise<Response>;
 
+/**
+ * Configuration options for {@link AbiRegistryClient}.
+ */
 export type AbiRegistryClientConfig = {
   /** Base URL of the hosted ABI registry, e.g. "https://abi.stellar.org". */
   baseUrl: string;

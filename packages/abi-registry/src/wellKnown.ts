@@ -23,6 +23,9 @@ type WellKnownEventRaw = {
   topics: WellKnownFieldRaw[];
   data: WellKnownFieldRaw[];
 };
+/**
+ * Raw, hand-authored well-known specification format before canonicalization.
+ */
 export type WellKnownSpecRaw = {
   version: string;
   name: string;

@@ -13,9 +13,16 @@ type CacheEntry<V> = {
   expiresAt: number;
 };
 
+/**
+ * Time-to-live LRU cache that evicts entries after expiry or when capacity is exceeded.
+ */
 export class TtlLruCache<V> {
   private readonly cache: LruCache<string, CacheEntry<V>>;
 
+  /**
+   * @param ttlMs Time-to-live for cache entries in milliseconds
+   * @param maxSize Maximum number of entries to retain
+   */
   constructor(
     private readonly ttlMs: number,
     maxSize: number,

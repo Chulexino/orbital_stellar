@@ -11,6 +11,9 @@ import type { RegistryPublisher, PublishResult } from "./RegistryPublisher.js";
 import { validateSpec, canonicalizeSpec } from "./spec.js";
 import type { ContractSpec } from "./spec.js";
 
+/**
+ * Configuration options for {@link OnChainRegistryPublisher}.
+ */
 export type OnChainRegistryPublisherConfig = {
   /** The deployed registry contract's ID (see contracts/registry). */
   contractId: string;

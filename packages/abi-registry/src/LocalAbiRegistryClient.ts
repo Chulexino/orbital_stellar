@@ -19,10 +19,16 @@ export interface LocalAbiRegistryClientConfig {
   cacheTtlMs?: number;
 }
 
+/**
+ * ABI registry client that reads and caches contract specs from a local directory.
+ */
 export class LocalAbiRegistryClient {
   private readonly specsDir: string;
   private readonly cache: TtlLruCache<XdrContractSpec | null>;
 
+  /**
+   * @param config Client configuration including specs directory and cache settings
+   */
   constructor(config: LocalAbiRegistryClientConfig) {
     // Remove trailing slash if present
     this.specsDir = config.specsDir.replace(/\\\/$/, "");
@@ -32,7 +38,12 @@ export class LocalAbiRegistryClient {
     );
   }
 
-  /** Fetch a single contract spec from the local directory (cached). */
+  /**
+   * Fetch a single contract spec from the local directory (cached).
+   *
+   * @param contractId Contract ID to fetch spec for
+   * @returns The contract spec, or null if not found
+   */
   async getSpec(contractId: string): Promise<XdrContractSpec | null> {
     const cached = this.getCached(contractId);
     if (cached !== undefined) return cached;
@@ -41,7 +52,12 @@ export class LocalAbiRegistryClient {
     return spec;
   }
 
-  /** Fetch multiple specs, loading only those not present in the cache. */
+  /**
+   * Fetch multiple specs, loading only those not present in the cache.
+   *
+   * @param contractIds Array of contract IDs to fetch
+   * @returns Record mapping contract IDs to their specs or null
+   */
   async getSpecs(contractIds: string[]): Promise<Record<string, XdrContractSpec | null>> {
     const result: Record<string, XdrContractSpec | null> = {};
     const uncached: string[] = [];
