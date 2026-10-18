@@ -37,14 +37,21 @@ export class BatchGenerationError extends Error {
   }
 }
 
+/**
+ * Result of a {@link generateBatchTypes} run: what was written and whether
+ * the lock file was updated.
+ */
 export interface BatchGenerationResult {
+  /** Number of contracts successfully generated. */
   contractsProcessed: number;
+  /** Per-contract details for the contracts that were generated. */
   contracts: Array<{
     contractId: string;
     name: string;
     outputPath: string;
     source: "registry" | "well-known" | "wasm";
   }>;
+  /** Whether `orbital.lock.json` was written as part of this run. */
   lockFileUpdated: boolean;
 }
 

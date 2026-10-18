@@ -1,6 +1,6 @@
 /**
  * Parses the `contractspecv0` custom WASM section soroban-sdk embeds via
- * `#[contractimpl]`/`#[contractevent]`/`#[contracttype]` into the canonical
+ * `#[contractimpl]`/{`#[contractevent]`}/{`#[contracttype]` into the canonical
  * spec building blocks - no human, no JSON file.
  *
  * The WASM section-walking logic and the streaming multi-entry XDR read loop
@@ -33,6 +33,11 @@ const XdrReader: typeof XdrReaderType = (
   require("@stellar/js-xdr") as { XdrReader: typeof XdrReaderType }
 ).XdrReader;
 
+/**
+ * Thrown when a contract's WASM has no embedded `contractspecv0` section -
+ * typically a non-Rust or stripped contract. Callers should fall back to a
+ * manually published registry override.
+ */
 export class NoEmbeddedSpecError extends Error {
   constructor() {
     super(
@@ -89,9 +94,16 @@ function findCustomSection(wasm: Uint8Array, sectionName: string): Buffer | null
   return null;
 }
 
+/**
+ * The canonical spec building blocks extracted from a contract's WASM by
+ * {@link parseWasmSpec}.
+ */
 export type ParsedWasmSpec = {
+  /** Functions declared in the contract's `contractspecv0` section. */
   functions: FunctionSpec[];
+  /** Events declared in the contract's `contractspecv0` section. */
   events: EventSpec[];
+  /** User-defined types keyed by type name. */
   types: Record<string, UserDefinedType>;
   /** Raw base64 XDR entries, preserved for decode.ts's ScSpecEntry-based decode path. */
   xdrEntries: string[];
@@ -108,6 +120,11 @@ export type ParsedWasmSpec = {
  *
  * Throws {@link NoEmbeddedSpecError} when the section is absent - stripped
  * or non-Rust contracts have no embedded spec to discover.
+ *
+ * @param wasmBytes The contract's WASM bytecode.
+ * @returns The parsed functions, events, types, and raw XDr entries.
+ * @throws {@link NoEmbeddedSpecError} When no `contractspecv0` section is
+ *   present.
  */
 export function parseWasmSpec(wasmBytes: Uint8Array): ParsedWasmSpec {
   const payload = findCustomSection(wasmBytes, "contractspecv0");

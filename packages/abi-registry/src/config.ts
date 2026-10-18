@@ -21,10 +21,18 @@ export interface ContractConfig {
    * defaults to.
    */
   network?: "mainnet" | "testnet" | "futurenet";
-  /** Per-contract RPC URL override. See `network` above. */
+  /** Per-contract(
+   * RPC URL override. See `network` above.
+   */
   rpcUrl?: string;
 }
 
+/**
+ * Top-level orbital codegen configuration, typically defined in an
+ * `orbital.config.ts` via `defineConfig`. Drives which contracts get
+ * types generated, and how their specs are resolved (registry, well-known,
+ * or WASM discovery).
+ */
 export interface OrbitalConfig {
   /** Array of contracts to generate types for */
   contracts: ContractConfig[];
@@ -41,7 +49,11 @@ export interface OrbitalConfig {
 }
 
 // Legacy aliases for backward compatibility with existing code
+
+/** Legacy alias for the per-contract config entry (see {@link ContractConfig}). */
 export type CodegenContract = ContractConfig;
+
+/** Legacy alias for the top-level codegen config (see {@link OrbitalConfig}). */
 export type OrbitalCodegenConfig = OrbitalConfig;
 
 /**
@@ -51,6 +63,10 @@ export function defineConfig(config: OrbitalConfig): OrbitalConfig {
   return config;
 }
 
+/**
+ * A single contract entry within a {@link LockFile}, recording the
+ * resolved spec hash and where it came from.
+ */
 export interface LockFileContract {
   /** Contract ID */
   contractId: string;
@@ -64,6 +80,10 @@ export interface LockFileContract {
   source: "registry" | "well-known" | "wasm";
 }
 
+/**
+ * Structured lock file (`orbital.lock.json`) written by codegen and
+ * used to detect config/spec drift in CI.
+ */
 export interface LockFile {
   /** Lock file format version */
   version: "1.0.0";
@@ -76,6 +96,11 @@ export interface LockFile {
 }
 
 // Legacy lock file types for backward compatibility
+
+/**
+ * Legacy lock file entry shape (keyed by contract name in
+ * {@link OrbitalLockFile}). New code should use {@link LockFile} instead.
+ */
 export interface OrbitalLockEntry {
   /** sha256 hex of the resolved ContractSpec JSON */
   specHash: string;
@@ -83,6 +108,10 @@ export interface OrbitalLockEntry {
   verifiedAt: string;
 }
 
+/**
+ * Legacy lock file shape: a map from contract name/ID to a
+ * {@link OrbitalLockEntry}. New code should use {@link LockFile} instead.
+ */
 export type OrbitalLockFile = Record<string, OrbitalLockEntry>;
 
 /**

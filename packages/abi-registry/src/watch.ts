@@ -5,9 +5,15 @@ import { generateContractTypes } from "./generate.js";
 import type { ContractSpec } from "./spec.js";
 import type { OrbitalCodegenConfig, OrbitalLockFile, CodegenContract } from "./config.js";
 
+/**
+ * Options for {@link watchCodegen}.
+ */
 export type CodegenWatchOptions = {
+  /** How often to poll for spec changes, in milliseconds (default 15000). */
   pollIntervalMs?: number;
+  /** Debounce window for bursts of changes, in milliseconds (default 2000). */
   debounceMs?: number;
+  /** Working directory to resolve `orbital.lock.json` from (defaults to `process.cwd()). */
   cwd?: string;
 };
 
@@ -34,6 +40,17 @@ async function resolveContractSpec(
   return { spec: JSON.parse(content) as ContractSpec, hash };
 }
 
+/**
+ * Regenerates the `.d.ts` types for a single contract from its cached
+ * spec file in the config's output directory. Writes atomically via a
+ * temporary file + rename so a consumer never observes a partial file.
+ *
+ * @param contractId Contract ID (C...) to generate types for.
+ * @param config The orbital codegen configuration.
+ * @param contractName Optional output name override; defaults to `contractId`.
+ * @returns The sha256 hex of the spec used, or `null` when no cached spec
+ *   could be found for the contract.
+ */
 export async function generateForContract(
   contractId: string,
   config: OrbitalCodegenConfig,
@@ -55,6 +72,13 @@ export async function generateForContract(
   return hash;
 }
 
+/**
+ * Writes an {@link OrbitalLockFile} to `orbital.lock.json` in `cwd`,
+ * atomically via a temporary file + rename.
+ *
+ * @param cwd Directory the lock file lives in.
+ * @param lock The lock file contents to persist.
+ */
 export function writeLockFile(cwd: string, lock: OrbitalLockFile): void {
   const lockPath = resolve(cwd, "orbital.lock.json");
   const tmpPath = `${lockPath}.tmp.${process.pid}`;
@@ -62,6 +86,15 @@ export function writeLockFile(cwd: string, lock: OrbitalLockFile): void {
   renameSync(tmpPath, lockPath);
 }
 
+/**
+ * Watches the configured contracts and regenerates their types when their
+ * cached specs change, updating `orbital.lock.json` as it goes. Runs until
+ * SIGINT/SIGTERM is received, then exits cleanly.
+ *
+ * @param config The orbital codegen configuration.
+ * @param options Polling/debounce/cwd tuning; see {@link CodegenWatchOptions}.
+ * @returns A promise that resolves when the watcher stops.
+ */
 export async function watchCodegen(
   config: OrbitalCodegenConfig,
   options: CodegenWatchOptions = {},
