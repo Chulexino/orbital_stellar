@@ -3,9 +3,9 @@
  *
  * All tests are hermetic — no network calls.  The Stellar SDK's
  * TransactionBuilder / FeeBumpTransaction are used directly so we exercise
- * real XDR round-trips rather than mocking SDK internals.
+ * real XDR round-trips. Failure tests inject errors at SDK boundaries.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   TransactionBuilder,
   Keypair,
@@ -464,4 +464,160 @@ describe("SponsorshipPolicy", () => {
     policy.record({ userId: "any", totalFeeStroops: 10_000_000n }, 0);
     expect(policy.dailySpentXlm).toBeCloseTo(1, 5);
   });
+});
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-01-01T12:00:00.000Z"));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() => {
+      throw new Error("Unexpected network request in Paymaster unit tests");
+    }),
+  );
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+describe("Paymaster configuration and failure accounting", () => {
+  it("creates a default policy when none is supplied", () => {
+    const operatorKp = Keypair.random();
+    const paymaster = new Paymaster({ operatorKeypair: operatorKp, networkPassphrase: NETWORK });
+    expect(paymaster.operatorAddress).toBe(operatorKp.publicKey());
+    expect(paymaster.spendSnapshot).toEqual({ dailySpentXlm: 0, dailyXlmCeiling: 10 });
+    expect(() =>
+      paymaster.bump({ innerXdr: signedXdr(Keypair.random()), baseFee: 10_001n }),
+    ).toThrow(FeeTooHighError);
+    expect(
+      paymaster.bump({ innerXdr: signedXdr(Keypair.random()), baseFee: 200n }).totalFeeStroops,
+    ).toBe(400n);
+  });
+
+  it("uses a raw policy configuration", () => {
+    const paymaster = new Paymaster({
+      operatorKeypair: Keypair.random(),
+      networkPassphrase: NETWORK,
+      policy: { maxFeePerBump: 200n, dailyXlmCeiling: 2 },
+    });
+    const innerXdr = signedXdr(Keypair.random());
+    expect(() => paymaster.bump({ innerXdr, baseFee: 201n })).toThrow(FeeTooHighError);
+    expect(paymaster.spendSnapshot).toEqual({ dailySpentXlm: 0, dailyXlmCeiling: 2 });
+    expect(paymaster.bump({ innerXdr, baseFee: 200n }).totalFeeStroops).toBe(400n);
+  });
+
+  it("rejects a signed empty transaction before checking sponsorship", () => {
+    const signer = Keypair.random();
+    const tx = new TransactionBuilder(new Account(signer.publicKey(), "0"), {
+      fee: "100",
+      networkPassphrase: NETWORK,
+    })
+      .setTimeout(30)
+      .build();
+    tx.sign(signer);
+    const policy = new SponsorshipPolicy();
+    const check = vi.spyOn(policy, "check");
+    const record = vi.spyOn(policy, "record");
+    const paymaster = new Paymaster({
+      operatorKeypair: Keypair.random(),
+      networkPassphrase: NETWORK,
+      policy,
+    });
+    expect(() => paymaster.bump({ innerXdr: tx.toXDR(), baseFee: 200n })).toThrow(
+      "inner transaction has no operations",
+    );
+    expect(check).not.toHaveBeenCalled();
+    expect(record).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    {
+      name: "rate-limited sponsorship",
+      config: { maxBumpsPerUserPerWindow: 1 },
+      prime: true,
+      error: RateLimitedError,
+    },
+    {
+      name: "over-budget base fee",
+      config: { maxFeePerBump: 199n },
+      prime: false,
+      error: FeeTooHighError,
+    },
+    {
+      name: "exhausted daily float",
+      config: { dailyXlmCeiling: 0 },
+      prime: false,
+      error: FloatExhaustedError,
+    },
+  ])("does not build or record after $name rejection", ({ config, prime, error }) => {
+    const policy = new SponsorshipPolicy(config);
+    const paymaster = new Paymaster({
+      operatorKeypair: Keypair.random(),
+      networkPassphrase: NETWORK,
+      policy,
+    });
+    const input = { innerXdr: signedXdr(Keypair.random()), baseFee: 200n };
+    if (prime) paymaster.bump(input);
+    const before = paymaster.spendSnapshot;
+    const record = vi.spyOn(policy, "record");
+    const build = vi.spyOn(TransactionBuilder, "buildFeeBumpTransaction");
+    expect(() => paymaster.bump(input)).toThrow(error);
+    expect(build).not.toHaveBeenCalled();
+    expect(record).not.toHaveBeenCalled();
+    expect(paymaster.spendSnapshot).toEqual(before);
+  });
+
+  it.each(["construction", "signing", "serialization"] as const)(
+    "propagates %s failure without charging spend or consuming the retry quota",
+    (stage) => {
+      const operatorKp = Keypair.random();
+      const policy = new SponsorshipPolicy({ maxBumpsPerUserPerWindow: 1 });
+      const record = vi.spyOn(policy, "record");
+      const paymaster = new Paymaster({
+        operatorKeypair: operatorKp,
+        networkPassphrase: NETWORK,
+        policy,
+      });
+      const inner = buildSignedTx(Keypair.random());
+      const input = { innerXdr: inner.toXDR(), baseFee: 200n };
+      const failure = new Error(`${stage} failed`);
+      const envelope = TransactionBuilder.buildFeeBumpTransaction(
+        operatorKp,
+        "200",
+        inner,
+        NETWORK,
+      );
+      const build = vi.spyOn(TransactionBuilder, "buildFeeBumpTransaction");
+      if (stage === "construction") {
+        build.mockImplementationOnce(() => {
+          throw failure;
+        });
+      } else {
+        build.mockReturnValueOnce(envelope);
+        if (stage === "signing") {
+          vi.spyOn(envelope, "sign").mockImplementationOnce(() => {
+            throw failure;
+          });
+        } else {
+          vi.spyOn(envelope, "toEnvelope").mockImplementationOnce(() => {
+            throw failure;
+          });
+        }
+      }
+      expect(() => paymaster.bump(input)).toThrow(failure);
+      expect(record).not.toHaveBeenCalled();
+      expect(paymaster.spendSnapshot.dailySpentXlm).toBe(0);
+      expect(paymaster.bump(input).totalFeeStroops).toBe(400n);
+      expect(record).toHaveBeenCalledExactlyOnceWith(
+        { userId: inner.source, totalFeeStroops: 400n },
+        Date.now(),
+      );
+      expect(paymaster.spendSnapshot.dailySpentXlm).toBe(0.00004);
+      expect(() => paymaster.bump(input)).toThrow(RateLimitedError);
+      expect(record).toHaveBeenCalledTimes(1);
+    },
+  );
 });
