@@ -34,14 +34,22 @@ const AssetOperationSchema = z.object({
   fee_percent: z.number().optional(),
 });
 
+/**
+ * Zod schema for the SEP-24 `/info` response: which deposit and withdrawal
+ * assets the anchor supports, keyed by asset code, along with any fee config.
+ */
 export const Sep24InfoSchema = z.object({
   deposit: z.record(z.string(), AssetOperationSchema).optional(),
   withdraw: z.record(z.string(), AssetOperationSchema).optional(),
   fee: z.object({ enabled: z.boolean() }).optional(),
 });
 
+/** Parsed Sep24InfoSchema response - the anchor's supported assets and limits. */
 export type Sep24Info = z.infer<typeof Sep24InfoSchema>;
 
+/**
+ * Zod schema for the response of a SEP-24 interactive initiation call.
+ */
 export const Sep24InteractiveResponseSchema = z.object({
   /** Always "interactive_customer_info_needed" per SEP-24. */
   type: z.string(),
@@ -51,6 +59,7 @@ export const Sep24InteractiveResponseSchema = z.object({
   id: z.string(),
 });
 
+/** Parsed Sep24InteractiveResponseSchema response - the webview URL and transaction id. */
 export type Sep24InteractiveResponse = z.infer<typeof Sep24InteractiveResponseSchema>;
 
 const SEP24_STATUSES = [
@@ -71,6 +80,9 @@ const SEP24_STATUSES = [
   "error",
 ] as const satisfies readonly Sep24Status[];
 
+/**
+ * Zod schema for a SEP-24 transaction record returned by `/transaction`.
+ */
 export const Sep24TransactionSchema = z.object({
   id: z.string(),
   kind: z.enum(["deposit", "withdrawal"]),
@@ -89,13 +101,18 @@ export const Sep24TransactionSchema = z.object({
   refunded: z.boolean().optional(),
 });
 
+/** Parsed Sep24TransactionSchema response - a single SEP-24 transaction's current state. */
 export type Sep24Transaction = z.infer<typeof Sep24TransactionSchema>;
 
+/** Options for constructing a {@link Sep24Client}. */
 export type Sep24ClientOptions = {
+  /** Custom fetch implementation. Defaults to the global `fetch`. */
   transport?: (input: string, init?: RequestInit) => Promise<Response>;
+  /** Per-request timeout in milliseconds. Defaults to 10000. */
   timeoutMs?: number;
 };
 
+/** Parameters for initiating a SEP-24 deposit or withdrawal. */
 export type Sep24InitiateParams = {
   asset_code: string;
   asset_issuer?: string;
@@ -106,11 +123,26 @@ export type Sep24InitiateParams = {
   fields?: Record<string, string>;
 };
 
+/**
+ * Client for the SEP-24 interactive deposit and withdrawal protocol.
+ *
+ * Wraps the anchor's transfer server `/info`, interactive initiation and
+ * transaction polling endpoints. Every method that talks to the anchor throws
+ * {@link Sep24Error} on a non-2 xx response or a body that does not match
+ * the expected schema; {@link Sep24CustomerInfoNeededError} is thrown instead
+ * when the anchor reports missing SEP-9 customer fields.
+ */
 export class Sep24Client {
   private readonly transferServer: string;
   private readonly transport: (input: string, init?: RequestInit) => Promise<Response>;
   private readonly timeoutMs: number;
 
+  /**
+   * Create a SEP-24 client against an anchor's transfer server.
+   *
+   * @param transferServer - Base URL of the anchor's SEP-24 transfer server.
+   * @param options - Optional transport override and timeout.
+   */
   constructor(transferServer: string, options: Sep24ClientOptions = {}) {
     this.transferServer = stripTrailingSlashes(transferServer);
     this.transport = options.transport ?? fetch.bind(globalThis);

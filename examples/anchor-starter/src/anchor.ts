@@ -1,3 +1,5 @@
+// TSDoc for SEP-24, SEP-31 and event exports lives on their declarations in
+// `@orbital-stellar/anchor-sdk`; this starter only consumes them.
 import { Keypair, Networks, TransactionBuilder } from "@stellar/stellar-sdk";
 import {
   discoverAnchor,
@@ -9,7 +11,12 @@ import {
 } from "@orbital-stellar/anchor-sdk";
 import type { StarterConfig } from "./config.js";
 
-/** Everything needed to talk to one anchor for the rest of a session. */
+/**
+ * Everything needed to talk to one anchor for the rest of a session.
+ *
+ * `sep24` and `sep31` are present only when the anchor's SEP-1 TOML advertises
+ * the corresponding server, so callers must null-check before use.
+ */
 export type AnchorSession = {
   toml: StellarToml;
   publicKey: string;
@@ -29,6 +36,10 @@ export type AnchorSession = {
  * the challenge: `Sep10Client.verifyChallenge` already rejects a challenge
  * whose `network_passphrase` disagrees with it, and the field is optional on
  * the wire, so signing must not depend on the anchor having echoed it back.
+ *
+ * @param keypair - Local keypair used to sign the challenge transaction.
+ * @param networkPassphrase - Network the challenge must be signed for.
+ * @returns A {@link ChallengeSigner} that signs and returns the XDR envelope.
  */
 export function keypairSigner(keypair: Keypair, networkPassphrase: string): ChallengeSigner {
   return (challenge) => {
@@ -41,6 +52,10 @@ export function keypairSigner(keypair: Keypair, networkPassphrase: string): Chal
 /**
  * SEP-1 discovery + SEP-10 authentication, in one call: the shared first step
  * of every command this starter offers.
+ *
+ * @param config - Starter configuration with home domain, secret and network.
+ * @returns An {@link AnchorSession} with the SEP-10 token and any SEP-24/31 clients.
+ * @throws If discovery fails or SEP-10 authentication is rejected by the anchor.
  */
 export async function connect(config: StarterConfig): Promise<AnchorSession> {
   const toml = await discoverAnchor(config.homeDomain);

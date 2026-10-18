@@ -1,5 +1,6 @@
 import type { Sep31Status } from "@orbital-stellar/pulse-core";
 
+/** Thrown when a SEP-31 status machine is asked to make a transition the spec does not allow. */
 export class InvalidStatusTransitionError extends Error {
   constructor(
     public from: Sep31Status,
