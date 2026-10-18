@@ -56,6 +56,7 @@ import type { WorkerFireVerdict } from "./workerFireVerdict.js";
 
 /** Current schema version. Increment when making a breaking field change. */
 export const WORKER_VERDICT_SCHEMA_VERSION = 1 as const;
+/** Literal type of the current worker verdict schema version. */
 export type WorkerVerdictSchemaVersion = typeof WORKER_VERDICT_SCHEMA_VERSION;
 
 /**
@@ -132,6 +133,14 @@ export class MissingCorrectionReasonError extends Error {
   }
 }
 
+/**
+ * Abstract, append-only store for {@link WorkerFireVerdict}s.
+ *
+ * Records are immutable: corrections are written as new records that
+ * `supersede` an earlier one. Concrete backends implement the protected
+ * `_write` plus the query methods; the shared `record` path enforces the
+ * duplicate- and correction-reason rules for every backend.
+ */
 export abstract class WorkerFireVerdictStore {
   /**
    * Writes a new verdict record. Throws {@link DuplicateVerdictRecordError}

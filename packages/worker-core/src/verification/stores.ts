@@ -23,6 +23,7 @@ export function verdictKey(subject: string, windowStart: number, windowEnd: numb
   return `${subject}|${windowStart}-${windowEnd}`;
 }
 
+/** In-memory {@link VerdictSink} for tests and short-lived runs. Verdicts are lost when the process exits. */
 export class InMemoryVerdictSink implements VerdictSink {
   private readonly map = new Map<string, Verdict>();
   async upsert(verdict: Verdict): Promise<void> {
@@ -83,12 +84,17 @@ export type BackfillCheckpoint = {
   updatedAt: string;
 };
 
+/**
+ * Persists {@link BackfillCheckpoint} state so a backfill can resume after a
+ * crash. Only the highest fully-flushed ledger is recorded.
+ */
 export interface CheckpointStore {
   load(): Promise<BackfillCheckpoint | null>;
   save(state: BackfillCheckpoint): Promise<void>;
   clear(): Promise<void>;
 }
 
+/** In-memory {@link CheckpointStore} for tests and single-process runs. */
 export class InMemoryCheckpointStore implements CheckpointStore {
   private state: BackfillCheckpoint | null = null;
   async load(): Promise<BackfillCheckpoint | null> {
@@ -102,6 +108,10 @@ export class InMemoryCheckpointStore implements CheckpointStore {
   }
 }
 
+/**
+ * File-backed {@link CheckpointStore}: stores the resume point in
+ * `backfill-checkpoint.json` inside the given directory.
+ */
 export class FileCheckpointStore implements CheckpointStore {
   private readonly file: string;
   constructor(dir: string) {

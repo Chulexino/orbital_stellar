@@ -66,6 +66,11 @@ export type WorkerVerdictWindow = {
   readonly deadlineLedger: number;
 };
 
+/**
+ * The outcome of verifying one worker against one obligation window: whether
+ * the declared invocation landed within the declared bound, plus the identity
+ * and evidence needed to dispute or audit it.
+ */
 export type WorkerFireVerdict = WorkerVerdictWindow & {
   readonly status: WorkerFireVerdictStatus;
   /** Set for `status: "not-due"` or `"unverifiable"` - which rule produced it. */

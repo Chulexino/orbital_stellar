@@ -162,6 +162,15 @@ function resolveWindow(
   return { ...window, status: "missed" };
 }
 
+/**
+ * Chain-derived verification engine: reconstructs obligation windows from
+ * canonical events and returns a {@link WorkerFireVerdict} for each, using the
+ * status taxonomy in `workerFireVerdict.ts`.
+ *
+ * Methods throw if called with a trigger kind they do not handle, or when the
+ * supplied `ledgerCloseTimes` index does not cover the requested range's
+ * endpoints, rather than guessing at a ledger.
+ */
 export class WorkerVerificationEngine {
   /**
    * Verifies a time-triggered worker over `[fromLedger, toLedger]`.

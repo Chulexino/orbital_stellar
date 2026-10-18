@@ -18,6 +18,11 @@ export type VerificationEventType =
   | "fee"
   | "set_authorized";
 
+/**
+ * A single canonicalized ledger operation, ready to be scored. Produced by the
+ * same mapper on both the export (backfill) and live paths, so the two inputs
+ * to the verdict engine are identical by construction.
+ */
 export type VerificationEvent = {
   ledger: number;
   closeTime: string;
@@ -136,6 +141,14 @@ export type LiveLedger = {
   transactions: ExportTransaction[];
 };
 
+/**
+ * Canonicalize the operations in one live ledger into verification events,
+ * using the same mapping as the export path.
+ *
+ * @param live - A post-normalization live ledger (ledger sequence, close time,
+ *   and its transactions).
+ * @returns The canonical {@link VerificationEvent}s for every operation in the ledger.
+ */
 export function fromLiveLedger(live: LiveLedger): VerificationEvent[] {
   return fromTransactions(live.transactions, live.ledger, live.closeTime);
 }

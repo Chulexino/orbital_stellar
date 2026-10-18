@@ -2,8 +2,10 @@ import { createHash } from "node:crypto";
 import type { VerificationEvent, VerificationEventType } from "./canonical.js";
 import { canonicalAddress, canonicalAsset, inferSubjectType } from "./canonical.js";
 
+/** Wire schema version for {@link Verdict}. Bump when the verdict core changes shape. */
 export const VERDICT_SCHEMA_VERSION = 1 as const;
 
+/** The ledger range a {@link Verdict} covers, with the close times of its endpoint ledgers. */
 export type VerdictWindow = {
   startLedger: number;
   endLedger: number;
@@ -11,6 +13,7 @@ export type VerdictWindow = {
   endCloseTime: string | null;
 };
 
+/** Aggregate metrics {@link computeVerdict} derives from a window's events. */
 export type VerdictMetrics = {
   eventCount: number;
   firstLedger: number | null;
@@ -23,8 +26,14 @@ export type VerdictMetrics = {
   setAuthorizedFalse: number;
 };
 
+/** Where a verdict's events came from: the live subscription (`"live"`) or a historical export (`"backfill"`). */
 export type VerdictSource = "live" | "backfill";
 
+/**
+ * A deterministic, source-independent score of a subject's activity over one
+ * ledger window. The `fingerprint` is identical for live and backfilled runs
+ * over the same (subject, window, events).
+ */
 export type Verdict = {
   schemaVersion: typeof VERDICT_SCHEMA_VERSION;
   subject: string;
