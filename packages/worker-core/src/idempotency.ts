@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { PgLike } from "./PostgresWorkerStateStore.js";
 
 export type FireKey = {
