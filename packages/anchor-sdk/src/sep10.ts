@@ -27,11 +27,16 @@ export class Sep10AuthError extends Error {
   }
 }
 
+/**
+ * Shape of the SEP-10 challenge response returned by the anchor's
+ * `WEB_AUTH_ENDPOINT`.
+ */
 export const Sep10ChallengeSchema = z.object({
   transaction: z.string(),
   network_passphrase: z.string().optional(),
 });
 
+/** SEP-10 challenge transaction plus the network passphrase the anchor built it for, if echoed. */
 export type Sep10Challenge = z.infer<typeof Sep10ChallengeSchema>;
 
 const Sep10TokenSchema = z.object({ token: z.string() });
@@ -42,6 +47,13 @@ const Sep10TokenSchema = z.object({ token: z.string() });
  */
 export type ChallengeSigner = (challenge: Sep10Challenge) => Promise<string> | string;
 
+/**
+ * Configuration for {@link Sep10Client}.
+ *
+ * All fields are required: without `serverAccountId` no challenge can be
+ * attributed to the anchor, and without `homeDomain`/`webAuthDomain` the
+ * challenge's Manage Data operations cannot be checked.
+ */
 export type Sep10ClientOptions = {
   /**
    * The anchor's `SIGNING_KEY` from its `stellar.toml` (see `discoverAnchor`).
@@ -64,6 +76,7 @@ export type Sep10ClientOptions = {
   timeoutMs?: number;
 };
 
+/** Parameters for {@link Sep10Client.authenticate}: the account, optional memo/client domain, and the challenge signer. */
 export type Sep10AuthenticateParams = {
   /** The Stellar account authenticating. */
   account: string;
@@ -75,6 +88,16 @@ export type Sep10AuthenticateParams = {
   sign: ChallengeSigner;
 };
 
+/**
+ * SEP-10 client: fetches the anchor's challenge, verifies it against the
+ * anchor's `SIGNING_KEY`, hands it to a caller-supplied signer, and exchanges
+ * the signed challenge for a session JWT.
+ *
+ * The client never holds key material. `webAuthEndpoint` must be `https`, and
+ * `serverAccountId`, `networkPassphrase`, `homeDomain` and `webAuthDomain` must
+ * all be supplied; a missing or cleartext configuration throws
+ * {@link Sep10AuthError} from the constructor rather than failing later.
+ */
 export class Sep10Client {
   private readonly webAuthEndpoint: string;
   private readonly serverAccountId: string;
