@@ -37,6 +37,9 @@ allowBuilds:
 # path-to-regexp 0.x has the backtracking-ReDoS advisory (GHSA-9wv6-86v2-598j);
 # scoped to @0 so express 5 - which requires 8.x - is not dragged back to a
 # version whose router API it cannot use.
+# proxy-addr <2.0.8 mishandles an IPv4-mapped IPv6 trust-proxy subnet, so a
+# spoofed client IP is trusted (critical advisory); reached via express in
+# examples/express-starter.
 overrides:
   "path-to-regexp@0": 0.1.13
   vite: 7.3.6
@@ -49,3 +52,4 @@ overrides:
   nanoid: ^3.3.17
   sharp: ^0.35.5
   undici: ^7.29.1
+  proxy-addr: ^2.0.8
