@@ -40,16 +40,25 @@ allowBuilds:
 # proxy-addr <2.0.8 mishandles an IPv4-mapped IPv6 trust-proxy subnet, so a
 # spoofed client IP is trusted (critical advisory); reached via express in
 # examples/express-starter.
+# GHSA bumps from the 2026-10-23 audit, all reached transitively and all
+# same-major: follow-redirects >=1.16.0 <1.16.1 (via stellar-sdk > axios),
+# source-map-js <1.2.2 (via postcss / @tailwindcss/node), and brace-expansion
+# 2.x <2.1.6 and 5.x <5.0.11 (via minimatch). Each major is scoped separately so
+# minimatch's two consumers stay on the line they require.
 overrides:
   "path-to-regexp@0": 0.1.13
-  vite: 7.3.6
+  vite: 7.3.7
   axios: ^1.20.0
   postcss: ^8.5.16
   "js-yaml@3": ^3.15.2
-  "js-yaml@4": ^4.3.1
+  "js-yaml@4": ^4.3.2
   fast-uri: ^3.1.6
   qs: ^6.16.0
   nanoid: ^3.3.17
   sharp: ^0.35.5
   undici: ^7.29.1
   proxy-addr: ^2.0.8
+  follow-redirects: ^1.16.1
+  source-map-js: ^1.2.2
+  "brace-expansion@2": ^2.1.6
+  "brace-expansion@5": ^5.0.11
