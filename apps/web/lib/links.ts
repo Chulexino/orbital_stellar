@@ -9,7 +9,7 @@
  */
 
 /** Canonical repository. Matches the badges and clone URLs in the root README. */
-export const GITHUB_REPO = "https://github.com/determined-001/orbital_stellar";
+export const GITHUB_REPO = "https://github.com/orbital-stellar/orbital_stellar";
 
 export const GITHUB_ISSUES = `${GITHUB_REPO}/issues/new/choose`;
 
