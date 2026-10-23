@@ -81,11 +81,22 @@ export type ComputationUnverifiableResult = WorkerVerdictWindow & {
   readonly detail: string;
 };
 
+/**
+ * Result of planning off-chain computation triggers over observed attestation
+ * occurrences, partitioned into verifiable windows and unverifiable results.
+ */
 export type ComputationPlanResult = {
   readonly windows: ReadonlyArray<ComputationWindow>;
   readonly unverifiable: ReadonlyArray<ComputationUnverifiableResult>;
 };
 
+/**
+ * A registered off-chain-computation trigger planner that resolves observed
+ * attestation occurrences into verifiable scoring windows or unverifiable results.
+ *
+ * Construct with {@link registerComputationTrigger}, which runs the
+ * registration-time gates. There is deliberately no public constructor that skips them.
+ */
 export class ComputationTriggerPlanner {
   private constructor(readonly definition: ComputationTriggerDefinition) {}
 
@@ -100,6 +111,10 @@ export class ComputationTriggerPlanner {
    * `EventTriggerPlanner.plan`: the same occurrences in the same order
    * produce the same result every time (occurrences are sorted by ledger
    * first, for the same reason).
+   *
+   * @param occurrences - Observed attestation occurrences to evaluate.
+   * @param now - Optional reference date for checking attestation expiry (defaults to current time).
+   * @returns Partitioned windows and unverifiable results.
    */
   plan(
     occurrences: ReadonlyArray<ComputationConditionOccurrence>,
@@ -169,6 +184,10 @@ export class ComputationTriggerPlanner {
   }
 }
 
+/**
+ * Result of registering an off-chain computation trigger, containing the
+ * planner instance on success or registration validation errors on failure.
+ */
 export type RegisterComputationTriggerResult =
   | { readonly ok: true; readonly trigger: ComputationTriggerPlanner }
   | { readonly ok: false; readonly errors: ReadonlyArray<string> };

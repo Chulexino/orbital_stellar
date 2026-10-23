@@ -103,12 +103,20 @@ export type SkipReason =
   /** The event carries no stable identity, so a re-delivery could not be recognised. */
   | "missing-event-id";
 
+/**
+ * An event that satisfied the trigger predicate but did not open a fire window,
+ * recorded with the reason it was skipped.
+ */
 export type SkippedEvent = {
   readonly reason: SkipReason;
   readonly conditionEventId: string | null;
   readonly conditionLedger: number | null;
 };
 
+/**
+ * Result of planning windows for a batch of normalized events, containing
+ * opened fire decisions and any skipped matching events.
+ */
 export type PlanResult = {
   readonly decisions: ReadonlyArray<FireDecision>;
   /**
@@ -367,6 +375,10 @@ export class EventTriggerPlanner {
   }
 }
 
+/**
+ * Result of registering an event trigger, containing the compiled planner or
+ * validation error messages.
+ */
 export type RegisterResult =
   | { readonly ok: true; readonly trigger: EventTriggerPlanner }
   | { readonly ok: false; readonly errors: ReadonlyArray<string> };

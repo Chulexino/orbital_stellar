@@ -52,6 +52,10 @@ export type ComputationAttestation = {
   readonly expiresAt?: string;
 };
 
+/**
+ * A signed cryptographic envelope containing a {@link ComputationAttestation} document,
+ * the signer's public key, and the signature.
+ */
 export type ComputationAttestationEnvelope = AttestationEnvelope<ComputationAttestation>;
 
 /** Signs a {@link ComputationAttestation}, producing a self-contained, offline-verifiable envelope. */
@@ -62,9 +66,17 @@ export function signComputationAttestation(
   return signAttestation(document, attesterSecret);
 }
 
+/**
+ * Specific reason why an off-chain computation attestation envelope failed verification:
+ * bad signature, undeclared signer, window mismatch, condition mismatch, or expired validity.
+ */
 export type ComputationAttestationInvalidReason =
   "bad-signature" | "signer-not-declared" | "window-mismatch" | "condition-mismatch" | "expired";
 
+/**
+ * Result of verifying a computation attestation envelope: either valid, or
+ * invalid with the failure reason and detail explanation.
+ */
 export type VerifyComputationAttestationResult =
   | { readonly status: "valid" }
   | {
@@ -73,6 +85,10 @@ export type VerifyComputationAttestationResult =
       readonly detail: string;
     };
 
+/**
+ * Verification parameters for validating a {@link ComputationAttestationEnvelope}
+ * against a worker's declared sources, expected window, and condition.
+ */
 export type VerifyComputationAttestationOptions = {
   /**
    * The worker's manifest-declared source(s) for this condition - property

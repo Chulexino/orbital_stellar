@@ -51,20 +51,32 @@ interface ScheduleBase {
   timezone: string;
 }
 
+/**
+ * A schedule that fires at a fixed time interval in milliseconds.
+ */
 export interface IntervalSchedule extends ScheduleBase {
   kind: "interval";
   /** Milliseconds between executions. */
   everyMs: number;
 }
 
+/**
+ * A schedule defined by a standard cron expression evaluated in a specific timezone.
+ */
 export interface CronSchedule extends ScheduleBase {
   kind: "cron";
   /** Standard 5-field cron expression, interpreted in `timezone`. */
   expression: string;
 }
 
+/**
+ * Union of supported time-based schedules (fixed interval or cron expression).
+ */
 export type Schedule = IntervalSchedule | CronSchedule;
 
+/**
+ * A time-driven trigger configured by a recurring schedule (interval or cron).
+ */
 export interface TimeTrigger {
   kind: "time";
   schedule: Schedule;

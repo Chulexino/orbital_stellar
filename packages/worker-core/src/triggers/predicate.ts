@@ -89,6 +89,10 @@ const TRADE_SIGNAL_EVENT_TYPES: ReadonlySet<string> = new Set([
   "lp.withdrawn",
 ]);
 
+/**
+ * Rejection reason returned when an event trigger condition includes market
+ * data types that require W4 custody guarantees.
+ */
 export const TRADE_SIGNAL_REJECTION =
   "trade-signal conditions are not available in W2. Conditions over offers and " +
   "liquidity pools are price observations, and a worker acting on a price needs " +

@@ -41,6 +41,7 @@
 // ---------------------------------------------------------------------------
 
 export const MANIFEST_SCHEMA_VERSION = "1.0.0" as const;
+/** Current supported schema version string literal for worker manifests. */
 export type ManifestSchemaVersion = typeof MANIFEST_SCHEMA_VERSION;
 
 // ---------------------------------------------------------------------------
@@ -68,6 +69,9 @@ export type TriggerSpec = CronTrigger;
 // Target
 // ---------------------------------------------------------------------------
 
+/**
+ * Descriptor for a static Soroban contract function parameter.
+ */
 export interface ParamSpec {
   readonly name: string;
   readonly type: string;
@@ -114,10 +118,17 @@ export interface LatencyBound {
 // Fire event
 // ---------------------------------------------------------------------------
 
+/**
+ * Topic matcher for filtering on-chain confirmation events: either an exact
+ * symbol match or a typed parameter matcher.
+ */
 export type TopicMatcher =
   | { readonly kind: "symbol"; readonly value: string }
   | { readonly kind: "typed"; readonly type: string; readonly doc?: string };
 
+/**
+ * Descriptor for an extracted event data payload field used in verification scoring.
+ */
 export interface DataFieldSpec {
   readonly name: string;
   readonly type: string;
@@ -142,6 +153,10 @@ export interface FireEventSpec {
 // Top-level manifest
 // ---------------------------------------------------------------------------
 
+/**
+ * Canonical descriptor for an automated worker, specifying its trigger,
+ * target Soroban contract function, latency commitment, and confirmation event.
+ */
 export interface WorkerManifest {
   readonly manifestVersion: ManifestSchemaVersion;
   /** Stable globally-unique worker identifier (e.g. `"my-org/oracle"`). */
@@ -262,6 +277,9 @@ export class WorkerManifestBuilder {
 // Validation errors
 // ---------------------------------------------------------------------------
 
+/**
+ * Describes a schema validation issue found in a worker manifest.
+ */
 export interface ManifestValidationIssue {
   /** JSON Pointer path to the offending field (e.g. `"/latencyBound/maxSeconds"`). */
   readonly path: string;
@@ -284,6 +302,9 @@ export class ManifestValidationError extends Error {
 // Validation result
 // ---------------------------------------------------------------------------
 
+/**
+ * Result of validating a manifest, indicating success or an array of validation issues.
+ */
 export type ValidationResult =
   | { readonly valid: true }
   | { readonly valid: false; readonly errors: readonly ManifestValidationIssue[] };
